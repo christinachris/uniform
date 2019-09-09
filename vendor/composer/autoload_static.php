@@ -70,6 +70,7 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
+            'Prophecy\\' => 9,
             'PhpParser\\' => 10,
             'Phinx\\' => 6,
         ),
@@ -208,6 +209,10 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
         'Psr\\Http\\Message\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
+        'Prophecy\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
         ),
         'PhpParser\\' => 
         array (
@@ -348,10 +353,6 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
         ),
         'P' => 
         array (
-            'Prophecy\\' => 
-            array (
-                0 => __DIR__ . '/..' . '/phpspec/prophecy/src',
-            ),
             'PayPal' => 
             array (
                 0 => __DIR__ . '/..' . '/paypal/rest-api-sdk-php/lib',

@@ -9,17 +9,15 @@
                 <p><?php echo $orgname ?></p>
             </div>
             <div class="lg-col-4 btn pull-right">
-                <?php echo $this->Html->link('Admin Dashboard',
-                    ['controller'=>'Admins', 'action'=>'admindashboard'],
-                    ['escape' => false, 'class' => 'btn btn-link']); ?>
+                <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('+ Add New Uniforms') . '</span>',
+                    ['controller'=>'Admins', 'action'=>'uniformadd',$oid],
+                    ['escape' => false, 'class' => 'btn btn-success']); ?>
             </div>
             <div class="col-lg-4">
                 <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('< Back to'.' '.$orgname.' details') . '</span>',
                 ['controller'=>'Admins', 'action'=>'organisationdetails', $iid],
                 ['escape' => false, 'class' => 'btn btn-outline-secondary']); ?>
-                <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('+ Add New Uniforms') . '</span>',
-                        ['controller'=>'Admins', 'action'=>'uniformadd',$oid],
-                        ['escape' => false, 'class' => 'btn btn-success']); ?>
+
             </div>
         </div>
     </div>
@@ -33,6 +31,7 @@
                             <th class="">Name</th>
                             <th class="">Type</th>
                             <th class="">Gender</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
 
@@ -44,6 +43,11 @@
                                     'action' => 'uniformdetails', $uniform->_id], ['class'=>'btn btn-info']);?></p></th>
                         <th style="vertical-align: middle"><p><?php echo $uniform['type'];?></p></th>
                         <th style="vertical-align: middle"><p><?php echo $uniform['gender'];?></p></th>
+                        <th style="vertical-align: middle"><p><?php
+                            if ($uniform['status'] == 1) {
+                                echo 'Active';
+                            } else echo 'Inactive';
+                            ?> </p></th>
                     </tr>
                     </tbody>
                     <?php } ?>

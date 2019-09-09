@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.10.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/8e971e004d.js"></script>
     <!-- Title of browser tab-->
     <title>SHOREDITCH CORPORATE | Uniforms and Workwear</title>
 
@@ -79,14 +80,42 @@
                         <!-- Nav Start -->
                         <div class="classynav">
                             <ul id="nav">
-                                <li><?= $this->Html->link( $aboutpagetitle, '/pages/Aboutus' );?></li>
-                                <li><?= $this->Html->link( $whatwedotitle, '/pages/Whatwedo' );?></li>
 
-                                <li><?= $this->Html->link( 'admin'   , ['controller'=>'Admins', 'action'=>'admindashboard'] );?></li>
-                                <li><?= $this->Html->link( $getintouch   , '/Admins/Getintouch' );?></li>
+
+                                <li> <?php if($this->request->getSession()->read('Auth')){
+                                        echo $this->Html->link(
+                                            '<span class="m-menu__link-text">'.' Admin Dashboard ' . '</span><i class="icon_tools">  </i>',
+                                            ['controller'=>'Admins', 'action'=>'admindashboard'],
+                                            ['escape' => false, 'class' => '']
+                                        );
+                                    } ?>
+                                    <ul class="dropdown">
+                                        <li>  <?php echo $this->Html->link(
+                                                 'Orgs and Uniforms',
+                                                ['controller'=>'Admins', 'action'=>'organisationlist'],
+                                                ['escape' => false, 'class' => '']
+                                            );
+                                            ?>
+                                        </li>
+                                        <li>
+                                            <?php echo $this->Html->link(' Website Contents ', ['controller'=>'Admins',
+                                                'action'=>'websitecontents'],
+                                                ['escape' => false, 'class' => '']);
+                                            ?>
+                                        </li>
+                                        <li>
+                                            <?php echo $this->Html->link(' Orders',
+                                                ['controller'=>'Admins', 'action'=>'orderlist'],
+                                                ['escape' => false, 'class' => '']
+                                            );
+                                            ?>
+                                        </li>
+                                    </ul>
+                                </li>
+
                                 <!-- only show my account drop down with options if customer is logged in-->
                                 <li> <?php if($this->request->getSession()->read('Auth')){
-                                        echo  $this->Html->link( 'My Account', [] );
+                                        echo  $this->Html->link( 'My Account', ['controller'=>'customers', 'action'=>'viewaccount'] );
                                     } ?>
                                     <ul class="dropdown">
                                         <li>  <?php if($this->request->getSession()->read('Auth')){

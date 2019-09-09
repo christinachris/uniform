@@ -15,6 +15,10 @@
             <p><?= h($order->id) ?></p>
         </div>
         <div class="form-group">
+            <b style="color: #262261;">PayPal Order Number</b>
+            <p><?= ($order->paypal) ?></p>
+        </div>
+        <div class="form-group">
             <b style="color: #262261;">Order Date</b>
             <p><?= h($order->orderdate) ?></p>
         </div>

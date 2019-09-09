@@ -19,6 +19,7 @@ class OrganisationsControllerTest extends TestCase
      */
     public $fixtures = [
         'app.Organisations',
+        'app.Customers',
         'app.Uniforms'
     ];
 

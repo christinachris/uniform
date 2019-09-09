@@ -11,6 +11,9 @@
 
     <div class="card-body">
         <div class="form-group">
+            <label style="padding-right: 10px">Uniform Status</label><?php echo $this->Form->select('status', $statusSelect, array('default' => $activeStatus));?>
+        </div>
+        <div class="form-group">
             <label>Uniform Name</label><?php echo $this->Form->name('uniformname', ['class'=>'form-control', 'required']) ?>
         </div>
         <div class="form-group">

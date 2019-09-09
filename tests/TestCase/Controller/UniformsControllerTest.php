@@ -73,24 +73,4 @@ class UniformsControllerTest extends TestCase
     {
         $this->markTestIncomplete('Not implemented yet.');
     }
-
-    /**
-     * Test showuniform method
-     *
-     * @return void
-     */
-    public function testShowuniform()
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
-
-    /**
-     * Test showuniformdetail method
-     *
-     * @return void
-     */
-    public function testShowuniformdetail()
-    {
-        $this->markTestIncomplete('Not implemented yet.');
-    }
 }

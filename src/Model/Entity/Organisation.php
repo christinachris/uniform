@@ -9,9 +9,11 @@ use Cake\ORM\Entity;
  * @property int $_id
  * @property string $organisationname
  * @property string $logopath
- * @property string|null $accesscode
- * @property string|null $bypasscode
+ * @property string $accesscode
+ * @property string $bypasscode
+ * @property bool $active
  *
+ * @property \App\Model\Entity\Customer[] $customers
  * @property \App\Model\Entity\Uniform[] $uniforms
  */
 class Organisation extends Entity
@@ -30,6 +32,8 @@ class Organisation extends Entity
         'logopath' => true,
         'accesscode' => true,
         'bypasscode' => true,
+        'active' => true,
+        'customers' => true,
         'uniforms' => true
     ];
 }

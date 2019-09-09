@@ -6,12 +6,14 @@
     <div class="row">
         <div class="col-lg-8 col-md-6 col-sm-4">
             <h3>Orders</h3>
+            <br>
         </div>
-        <div class="lg-col-4 btn pull-right">
-            <?php echo $this->Html->link('Admin Dashboard',
-                    ['controller'=>'Admins', 'action'=>'admindashboard'],
-                    ['escape' => false, 'class' => 'btn btn-link']); ?>
-        </div>
+
+            <?= $this->Form->create(null, ['url' => ['controller' => 'Admins', 'action' => 'orderlist']]); ?>
+            <div style="display: flex;">
+                <?php echo $this->Form->control('Order_ID', [ 'label'=> 'Search Order ID', 'class'=>'form-control']);  ?>
+                <span class="input-group-btn" style="padding-top: 32px"><?= $this->Form->submit('Search', ['class' => 'btn btn-dark']) ?></span>
+            </div>
     </div>
     <div>
         <nav aria-label="Page navigation">
@@ -65,7 +67,6 @@
         </tr>
         </thead>
         <br>
-
 
         <tbody>
         <?php foreach($orders as $order){ ?>

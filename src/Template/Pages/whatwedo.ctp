@@ -54,7 +54,7 @@
             <div class="col-12 col-sm-6 col-lg-2" >
                 <a href="https://akubra.com.au/pages/catalogues" target="_blank">
                     <div  style="position: absolute; top: 50%; transform: translateY(-50%)">
-                        <?php echo "<p style='max-width: 90% !important; height: auto; width: auto;'>".$this->Html->image('../img/suppliers/akubra.jpg', ['alt' => 'CakePHP'])."</p>";?>
+                        <?php echo "<p style='max-width: 90% !important; height: auto; width: auto;'>".$this->Html->image('../img/suppliers/Akubra.jpg', ['alt' => 'CakePHP'])."</p>";?>
                     </div>
                 </a>
             </div>
@@ -92,7 +92,7 @@
             <div class="col-12 col-sm-6 col-lg-2" style="position: relative;">
                 <a href="https://johnkevin.com/catalogue/" target="_blank">
                     <div  style="position: absolute; top: 50%; transform: translateY(-50%)">
-                        <?php echo "<p style='max-width: 90% !important; height: auto; width: auto;'>".$this->Html->image('../img/suppliers/JKevin.png', ['alt' => 'CakePHP'])."</p>";?>
+                        <?php echo "<p style='max-width: 90% !important; height: auto; width: auto;'>".$this->Html->image('../img/suppliers/JKevin.PNG', ['alt' => 'CakePHP'])."</p>";?>
                     </div>
             </div>
 
@@ -101,7 +101,7 @@
             <div class="col-12 col-sm-6 col-lg-2" style="position: relative;">
                 <a href="" target="_blank">
                     <div  style="position: absolute; top: 50%; transform: translateY(-50%)">
-                        <?php echo "<p style='max-width: 90% !important; height: auto; width: auto;'>".$this->Html->image('../img/suppliers/MtF.png', ['alt' => 'CakePHP'])."</p>";?>
+                        <?php echo "<p style='max-width: 90% !important; height: auto; width: auto;'>".$this->Html->image('../img/suppliers/MtF.PNG', ['alt' => 'CakePHP'])."</p>";?>
                     </div>
             </div>
         </div>
@@ -205,7 +205,7 @@
             <div class="section-narrow-column">
                 <a href="https://akubra.com.au/pages/catalogues" target="_blank">
                     <div  style="position: relative; top: 50%;">
-                        <?php echo "<p style='height: auto; width: auto;'>".$this->Html->image('../img/suppliers/akubra.jpg', ['alt' => 'CakePHP'])."</p>";?>
+                        <?php echo "<p style='height: auto; width: auto;'>".$this->Html->image('../img/suppliers/Akubra.jpg', ['alt' => 'CakePHP'])."</p>";?>
                     </div>
                 </a>
             </div>
@@ -245,7 +245,7 @@
             <div class="section-narrow-column">
                 <a href="https://johnkevin.com/catalogue/" target="_blank">
                     <div  style="position: relative; top: 50%;">
-                        <?php echo "<p style='height: auto; width: auto;'>".$this->Html->image('../img/suppliers/JKevin.png', ['alt' => 'CakePHP'])."</p>";?>
+                        <?php echo "<p style='height: auto; width: auto;'>".$this->Html->image('../img/suppliers/JKevin.PNG', ['alt' => 'CakePHP'])."</p>";?>
                     </div>
             </div>
 
@@ -254,7 +254,7 @@
             <div class="section-narrow-column">
                 <a href="" target="_blank">
                     <div  style="position: relative; top: 50%;">
-                        <?php echo "<p style='height: auto; width: auto;'>".$this->Html->image('../img/suppliers/MtF.png', ['alt' => 'CakePHP'])."</p>";?>
+                        <?php echo "<p style='height: auto; width: auto;'>".$this->Html->image('../img/suppliers/MtF.PNG', ['alt' => 'CakePHP'])."</p>";?>
                     </div>
             </div>
         </div>

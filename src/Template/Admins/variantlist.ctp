@@ -1,11 +1,6 @@
 <div>
     <?= $this->Flash->render() ?>
 </div>
-<div class="col-lg-4">
-    <?php echo $this->Html->link('Admin Dashboard',
-        ['controller'=>'Admins', 'action'=>'admindashboard'],
-        ['escape' => false, 'class' => 'btn btn-link']); ?>
-</div>
 
 <div class="section-heading text-center"></div>
 
@@ -20,6 +15,12 @@
                     <p><?php echo $orgname ?> </p>
                 </div>
                 <div class="col-lg-4">
+                    <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('+ Add New Variant') . '</span>',
+                        ['controller'=>'Admins', 'action'=>'variantadd',$uniformid],
+                        ['escape' => false, 'class' => 'btn btn-success']); ?>
+
+                </div>
+                <div class="col-lg-6">
                     <?php echo $this->Html->link('< Back to '. $uniformname.' uniform details',
                         ['controller'=>'Admins', 'action'=>'uniformdetails',$uniformid],
                         ['escape' => false, 'class' => 'btn btn-outline-dark']); ?>
@@ -28,11 +29,6 @@
                         ['controller'=>'Admins', 'action'=>'uniformlist',$orgid],
                         ['escape' => false, 'class' => 'btn btn-outline-info']); ?>
 
-                </div>
-                <div class="col-lg-6">
-                <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('+ Add New Variant') . '</span>',
-                    ['controller'=>'Admins', 'action'=>'variantadd',$uniformid],
-                    ['escape' => false, 'class' => 'btn btn-success']); ?>
                 </div>
             </div>
         </div>

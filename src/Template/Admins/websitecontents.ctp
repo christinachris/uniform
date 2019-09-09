@@ -7,11 +7,6 @@
             <div class="col-lg-8 col-md-6 col-sm-4">
                 <h3>Website Contents</h3>
             </div>
-            <div class="col-lg-4">
-                <?php echo $this->Html->link('< Back to Admin Dashboard',
-                    ['controller'=>'Admins', 'action'=>'admindashboard'],
-                    ['escape' => false, 'class' => 'btn btn-outline-secondary']); ?>
-            </div>
 
         </div>
     </div>

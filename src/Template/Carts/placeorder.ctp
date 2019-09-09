@@ -61,6 +61,7 @@
                         return actions.order.capture().then(function(details) {
                             $.ajax({
                                 url: '<?php echo $this->Url->build("/Carts/saveorder", true); ?>',
+
                                 headers: {
                                     'X-CSRF-TOKEN':'<?php echo $this->request->getParam("_csrfToken"); ?>',
                                 },
@@ -72,10 +73,11 @@
                                 }
                             });
 
+
                             setTimeout(myFunction, 3000);
 
                             function myFunction() {
-                                window.location.href = '<?php echo $this->Url->build("/Carts/orderconfirmed/", true); ?>/'+details.id;
+                                window.location.href = '<?php echo $this->Url->build("/Carts/orderconfirmed", true); ?>/'+details.id;
                             }
 
                         });

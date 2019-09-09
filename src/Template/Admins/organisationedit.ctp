@@ -8,6 +8,9 @@
     <h3 class="card-header">Edit Organisation</h3>
     <div class="card-body">
         <div class="form-group">
+            <label style="padding-right: 10px">Organisation Status</label><?php echo $this->Form->select('active', $statusSelect, array('default' => $activeStatus));?>
+        </div>
+        <div class="form-group">
             <label>Name</label><?php echo $this->Form->name('organisationname', ['class'=>'form-control', 'required']) ?>
         </div>
         <div class="form-group">

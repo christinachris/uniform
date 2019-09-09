@@ -5,7 +5,15 @@
     <div class="card-header">
         <div class="row">
             <div class="col-lg-8 col-md-6 col-sm-4">
-                <h3>Admin Dashboard</h3>
+                <h3>
+
+                <?php echo $this->Html->link(
+                    '<span class="m-menu__link-text">'.' Admin Dashboard ' . '</span><i class="icon_tools">  </i>',
+                    ['controller'=>'Admins', 'action'=>'admindashboard'],
+                    ['escape' => false, 'class' => '']
+                );
+                ?>
+                </h3>
             </div>
          </div>
     </div>

@@ -9,8 +9,7 @@ use Cake\Validation\Validator;
 /**
  * Organisations Model
  *
- * @property |\Cake\ORM\Association\HasMany $Customers
- * @property |\Cake\ORM\Association\HasMany $Orders
+ * @property \App\Model\Table\CustomersTable|\Cake\ORM\Association\HasMany $Customers
  * @property \App\Model\Table\UniformsTable|\Cake\ORM\Association\HasMany $Uniforms
  *
  * @method \App\Model\Entity\Organisation get($primaryKey, $options = [])
@@ -39,9 +38,6 @@ class OrganisationsTable extends Table
         $this->setPrimaryKey('_id');
 
         $this->hasMany('Customers', [
-            'foreignKey' => 'organisation_id'
-        ]);
-        $this->hasMany('Orders', [
             'foreignKey' => 'organisation_id'
         ]);
         $this->hasMany('Uniforms', [
@@ -74,11 +70,18 @@ class OrganisationsTable extends Table
 
         $validator
             ->scalar('accesscode')
-            ->allowEmptyString('accesscode');
+            ->requirePresence('accesscode', 'create')
+            ->allowEmptyString('accesscode', false);
 
         $validator
             ->scalar('bypasscode')
-            ->allowEmptyString('bypasscode');
+            ->requirePresence('bypasscode', 'create')
+            ->allowEmptyString('bypasscode', false);
+
+        $validator
+            ->boolean('active')
+            ->requirePresence('active', 'create')
+            ->allowEmptyString('active', false);
 
         return $validator;
     }

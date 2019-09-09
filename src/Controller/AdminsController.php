@@ -473,9 +473,11 @@ class AdminsController extends AppController
     public function organisationlist(){
 
         $this->loadModel('organisations');
-
-        $organisations =  $this->organisations->find('all');
-
+        //set condition so that it finds all organisations except for the admin one
+        $conditions = ['organisationname !='=> 'Shoreditch Corporate Admin'];
+        //save all organisations found in variable
+        $organisations =  $this->organisations->find('all')->where($conditions);
+        //set list/array variable to be shown in view
         $this->set('organisations',$organisations);
     }
 
@@ -483,17 +485,25 @@ class AdminsController extends AppController
 
         $this->loadModel('organisations');
         $organisation = $this->organisations->get($id);
-        $this->set('organisation',$organisation);
+        $activeCodition = $organisation->active;
 
-//        $key = 'nDQJ7e5dzMS4AQTQGTIyfHMu5O6OcauP';
-//        $orgaccesscode = $organisation->accesscode; //fetch access code value from db
-//        $decodeaccesscode = base64_decode($orgaccesscode); //Cipher stored in database is base64-encoded binary, so decode into binary first
-//        $decryptaccesscode = Security::decrypt($decodeaccesscode, $key); //then decrypt the string
-//        $this->set('decryptaccesscode', $decryptaccesscode);
+        if ($activeCodition == 0){
+            $activeStatus = "Inactive";
+        }
+        else{
+            $activeStatus ="Active";
+        }
+
+        $this->set('activeStatus',$activeStatus);
+
+        $this->set('organisation', $organisation);
 
     }
 
     public function organisationadd(){
+
+        $statusSelect = array('1' => 'Active','0'=> 'Inactive');
+        $this->set('statusSelect', $statusSelect);
 
         $this->loadModel('organisations');
 
@@ -504,17 +514,14 @@ class AdminsController extends AppController
             $accesscode = $this->request->getData('accesscode');
             $bypasscode = $this->request->getData('bypasscode');
             $logo = $this->request->getData('logopath');
+            $status = $this->request->getData('active');
 
-//            $key = 'nDQJ7e5dzMS4AQTQGTIyfHMu5O6OcauP';
-//            $cipher = Security::encrypt($accesscode, $key); //encrypt
-//            $db_string = base64_encode($cipher); //encrypted string is binary, therefore encode first before send to db
 
             $newOrg->organisationname = $name;
             $newOrg->accesscode = $accesscode;
             $newOrg->bypasscode = $bypasscode;
             $newOrg->logopath = $logo;
-
-
+            $newOrg->active = $status;
             if ($this->organisations->save($newOrg)) {
 
                 $this->Flash->set('The data has been added', ['element' => 'success']);
@@ -536,15 +543,24 @@ class AdminsController extends AppController
         $organisation = $this->organisations->get($id);
         $this->set('organisation', $organisation);
 
+        $statusSelect = array('1' => 'Active','0'=> 'Inactive');
+        $this->set('statusSelect', $statusSelect);
+
+        $activeCondition = $organisation->active;
+
+        if ($activeCondition == 0){
+            $activeStatus = "Inactive";
+        }
+        else{
+            $activeStatus ="Active";
+        }
+
+        $this->set('activeStatus',$activeStatus);
+
         if ($this->request->is(['patch', 'post', 'put'])) {
 
 
             $organisation = $this->organisations->patchEntity($organisation, $this->request->getData());
-//            $accesscode = $this->request->getData('accesscode'); //get access code entered in form
-//            $key = 'nDQJ7e5dzMS4AQTQGTIyfHMu5O6OcauP';
-//            $cipher = Security::encrypt($accesscode, $key); //encrypt
-//            $db_string = base64_encode($cipher); //encrypted string is binary, therefore encode first before send to db
-//            $organisation->accesscode = $db_string;
 
             if ($this->organisations->save($organisation)) {
 
@@ -606,6 +622,7 @@ class AdminsController extends AppController
         $this->set('iid', $iid);
 
 
+
     }
 
     public function uniformdetails($id=0){
@@ -628,6 +645,17 @@ class AdminsController extends AppController
         $this->set('orgname', $orgname);
         $this->set('pictures', $pictures);
 
+        $activeCodition = $uniform->status;
+
+        if ($activeCodition == 0){
+            $activeStatus = "Inactive";
+        }
+        else{
+            $activeStatus ="Active";
+        }
+
+        $this->set('activeStatus',$activeStatus);
+
 
 
 
@@ -645,6 +673,20 @@ class AdminsController extends AppController
         $organisation = $this->Organisations->findBy_Id($orgid)->first();
         $orgname = $organisation->organisationname;
         $this->set('orgname', $orgname);
+
+        $statusSelect = array('1' => 'Active','0'=> 'Inactive');
+        $this->set('statusSelect', $statusSelect);
+
+        $activeCondition = $uniform->status;
+
+        if ($activeCondition == 0){
+            $activeStatus = "Inactive";
+        }
+        else{
+            $activeStatus ="Active";
+        }
+
+        $this->set('activeStatus',$activeStatus);
 
         if ($this->request->is(['patch', 'post', 'put'])) {
 
@@ -667,6 +709,9 @@ class AdminsController extends AppController
 
     public function uniformadd($oid){
 
+        $statusSelect = array('1' => 'Active','0'=> 'Inactive');
+        $this->set('statusSelect', $statusSelect);
+
         $this->loadModel('Organisations');
         $this->loadModel('Uniforms');
         $organisation = $this->Organisations->get($oid);
@@ -678,17 +723,10 @@ class AdminsController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
 
-            debug($this->getRequest()->getData());
-            debug($this->getRequest()->getUploadedFiles());
-            exit;
-
-
-
-
-
-
             $uniform = $this->Uniforms->patchEntity($uniform, $this->request->getData());
             $uniform->organisation_id = $oid;
+
+
 
             if ($this->Uniforms->save($uniform)){
                 $this->Flash->success(__('The data has been added.'));
@@ -859,10 +897,46 @@ class AdminsController extends AppController
             'Paginator'=>['templates'=>'paginator-templates']
         ];
 
-        $orders = $this->paginate($this->Orders->find('all', array('order'=>'Orders.id DESC')));
+        $orders = $this->paginate($this->Orders->find('all', array('order' => 'Orders.id DESC')));
 
         //var_dump($orders);
         $this->set('orders', $orders);
+
+
+        if ($this->request->is('post')) {
+
+            $id = $this->request->getData('Order_ID');
+
+            if ($id!=null ) {
+
+                if (is_numeric($id)){
+
+                    $orders = $this->paginate($this->Orders->find('all', array('order' => 'Orders.id DESC'))->where(['Orders.id' => $id]));
+
+                    //var_dump($orders);
+                    $this->set('orders', $orders);
+
+                }
+                else{
+                    $this->Flash->error(__('Please input integer'));
+                    $orders = $this->paginate($this->Orders->find('all', array('order'=>'Orders.id DESC')));
+
+                    //var_dump($orders);
+                    $this->set('orders', $orders);
+
+                }
+
+
+            }
+
+            else{
+                $orders = $this->paginate($this->Orders->find('all', array('order'=>'Orders.id DESC')));
+
+                //var_dump($orders);
+                $this->set('orders', $orders);
+            }
+        }
+
 
 
     }

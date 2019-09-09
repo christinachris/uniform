@@ -2,7 +2,7 @@
     <?= $this->Flash->render() ?>
 </div>
 <div class="card">
-    <?= $this->Form->create($uniform,['type' => 'file']); ?>
+    <?= $this->Form->create($uniform); ?>
     <div class="card-header">
         <div class="row">
             <div class="col-lg-8 col-md-6 col-sm-4">
@@ -36,8 +36,11 @@
             <label>Description</label><?php echo $this->Form->uniformdescription('uniformdescription', ['class'=>'form-control', 'required']) ?>
         </div>
         <div class="form-group">
-            <label>Image</label><?php echo $this->Form->control('heroimagepath', ['type' => 'file']); ?>
+            <label style="padding-right: 10px">Uniform Status </label><?php echo $this->Form->select('status', $statusSelect);?>
         </div>
+        <!--<div class="form-group">-->
+            <!--<label>Image</label><?php echo $this->Form->control('heroimagepath', ['type' => 'file']); ?>-->
+        <!--</div>-->
     </div>
     <div>
         <?php echo $this->Form->submit('Save', ['class'=>'btn akame-btn active','style'=>'margin-left:35%']); ?>

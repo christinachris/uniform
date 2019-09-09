@@ -11,14 +11,6 @@
                         <h3>Organisations</h3>
                     </div>
                     <div class="col-lg-4">
-                        <?php echo $this->Html->link('< Admin Dashboard',
-                            ['controller'=>'Admins', 'action'=>'admindashboard'],
-                            ['escape' => false, 'class' => 'btn btn-outline-secondary']); ?>
-                    </div>
-                </div>
-                <br>
-                <div class="row">
-                    <div class="col-lg-6">
                         <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('+ Add New Organisation') . '</span>',
                             ['controller'=>'Admins', 'action'=>'organisationadd'],
                             ['escape' => false, 'class' => 'btn btn-success']); ?>
@@ -31,15 +23,19 @@
 
                     <?php foreach($organisations as $organisation){ ?>
                     <div class="basket-product">
-                        <div class="item">
-                            <?php echo $this->Html->link($organisation['organisationname'],['controller'=>'admins', 'action' => 'organisationdetails', $organisation->_id], ['class'=>'btn btn-outline-primary']);?>
-                        </div>
+                        <p class="item ">
+                                 <?php echo $this->Html->link($organisation['organisationname'],['controller'=>'admins', 'action' =>
+                                'organisationdetails', $organisation->_id], ['class'=>'btn btn-outline-primary']);?>
 
-
+                                <p style="color: #262261"><?php
+                                if ($organisation['active'] == 1) {
+                                    echo 'active';
+                                } else echo 'inactive';
+                                ?>
+                                </p>
                     </div>
                     <?php } ?>
                 </div>
-
             </div>
         </div>
     </div>

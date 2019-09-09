@@ -148,18 +148,14 @@ class CustomersController extends AppController
 
         if ($this->request->is('post')) {
 
+            //validate phone number first
             $phone = $this->request->getData('phone');
-
             $a= ((int) $phone) ;
-
-
             $int_array  = array_map('intval', str_split($phone));
             //get the lenght of the array
             $int_lenght = count($int_array);
-
             $c=is_int($a);
-
-            if( $c  &&  $int_lenght==10  ) {
+            if( $c  &&  $int_lenght==10) {
 
 
                 //first check if email is already in use
@@ -181,48 +177,52 @@ class CustomersController extends AppController
                 $accesspassword = $this->request->getData('organisationcode'); //retrieve input from the form view
                 $this->loadModel('Organisations'); //load model
                 $query = $this->Organisations->findByAccesscode($accesspassword)->first(); //find matching organisation access code to input
-                $customer->organisation_id = $query->_id; //put correct organisation id into the customer record
+                //check if the organisation is active
+                $orgactivestatus = $query->active;
+                if ($orgactivestatus==1) {
 
-                $orgmatch = ['accesscode' => $accesspassword]; //email = user email in form
-                $org_exists = $this->Organisations->exists($orgmatch); //check if the email exists in the customers table.
-                if ($org_exists == false) {
-                    $orgcoderror = 'The organisation code is incorrect or invalid. Please try again, or contact us.';
-                }
+                    $customer->organisation_id = $query->_id; //put correct organisation id into the customer record
 
-                if ($this->Customers->save($customer)) {
-                    $this->Flash->set('Registration successful, your confirmation email has been sent to ' . $this->request->getData('email'), ['element' => 'success']);
+                    $orgmatch = ['accesscode' => $accesspassword]; //email = user email in form
+                    $org_exists = $this->Organisations->exists($orgmatch); //check if the email exists in the customers table.
+                    if ($org_exists == false) {
+                        $orgcoderror = 'The organisation code is incorrect or invalid. Please try again, or contact us.';
+                    }
 
-                    //email details
-                    $email = new Email('default');
-                    $email->setattachments([
-                        'SClogo.png' => [
-                            'file' => WWW_ROOT . 'img' . DS . 'SClogo.png',
-                            'mimetype' => 'image/png',
-                            'contentId' => 'SClogo'
-                        ]
-                    ]);
-                    $email->setEmailFormat('html');
-                    $email->setFrom('noreply@shoreditchcorporate.com.au', 'Shoreditch Corporate');
-                    $email->setSubject('Please confirm your email to activate your account');
-                    $email->setTo($this->request->getData('email'));
-                    $email->setTemplate('register');
-                    $email->setViewVars([
-                        'name' => $this->request->getData('firstname'),
-                        'token' => $customer->token
-                    ]);
-                    $email->send();
+                    if ($this->Customers->save($customer)) {
+                        $this->Flash->set('Registration successful, your confirmation email has been sent to ' . $this->request->getData('email'), ['element' => 'success']);
+
+                        //email details
+                        $email = new Email('default');
+                        $email->setattachments([
+                            'SClogo.png' => [
+                                'file' => WWW_ROOT . 'img' . DS . 'SClogo.png',
+                                'mimetype' => 'image/png',
+                                'contentId' => 'SClogo'
+                            ]
+                        ]);
+                        $email->setEmailFormat('html');
+                        $email->setFrom('noreply@shoreditchcorporate.com.au', 'Shoreditch Corporate');
+                        $email->setSubject('Please confirm your email to activate your account');
+                        $email->setTo($this->request->getData('email'));
+                        $email->setTemplate('register');
+                        $email->setViewVars([
+                            'name' => $this->request->getData('firstname'),
+                            'token' => $customer->token
+                        ]);
+                        $email->send();
+                    } else {
+                        //return error if cannot create account and send email
+                        $this->Flash->error(__('Account could not be created. ' . $emailerror . ' ' . $orgcoderror));
+                    }
                 } else {
-                    //return error if cannot create account and send email
-                    $this->Flash->error(__('Account could not be created. ' . $emailerror . ' ' . $orgcoderror));
+                    $this->Flash->error(__('Account could not be created: organisation is currently inactive. Please contact us for more information'));
                 }
             }
             else {
 
                 $this->Flash->error(__('Please enter a valid Australian phone number.'));
                 return $this->redirect(['action' => 'register']);
-
-
-
 
             }
         }

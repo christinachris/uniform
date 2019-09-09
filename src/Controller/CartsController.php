@@ -29,24 +29,42 @@ class CartsController extends AppController
 
         if ($this->request->action === 'orderconfirmed') {
             $postId=$this->request->params['pass'][0];
-
             $this->loadModel('Orders');
             $this->loadModel('Orderitems');
             $this->loadModel('Customers');
 
 
 
-            $order = $this->Orders->find('all', array('conditions' => array('Orders.paypal' => $postId)))->first();
 
+            if(is_numeric($postId)){
+                $order = $this->Orders->find('all', array('conditions' => array('Orders.id' => $postId)))->first();
 
-
-
-            if ($order->customer_id==$user['id']) {
-                return true;
+                if ($order->customer_id==$user['id']) {
+                    return true;
+                }
+                else{
+                    return false;
+                }
             }
             else{
-                return false;
+                $order = $this->Orders->find('all', array('conditions' => array('Orders.paypal' => $postId)))->first();
+                //var_dump($order);
+                if ($order->customer_id==$user['id']) {
+                    return true;
+                }
+                else{
+                    return false;
+                }
+
+
             }
+
+
+
+
+
+            //var_dump($order);
+
 
        }
         else{
@@ -160,6 +178,7 @@ class CartsController extends AppController
         $this->loadModel('Variants');
         $this->loadModel('Customers');
         $this->loadModel('Uniforms');
+        $this->loadModel('Organisations');
 
         $products = $this->Carts->find('all', array(
             'conditions' => array(
@@ -182,60 +201,86 @@ class CartsController extends AppController
 
     //ADD ITEM TO CART FUNCTION:
     public function addCartItem(){
-        $cartitem = $this->Carts->newEntity();
+        $this->loadModel('Customers');
+        $this->loadModel('Uniforms');
+        $this->loadModel('Organisations');
+        $this->loadModel('Uniforms');
+        $customerID = $this->Auth->user('id');
 
-        if ($this->request->is('post')){
-            //save values submitted in form - uniform id, colour and size
-            $uniform_id = $this->request->getData('uniform_id');
-            $colour = $this->request->getData('colour');
-            $size = $this->request->getData('size');
+        //check if organisation is currently inactive
+        $customer = $this->Customers->findById($customerID)->first();
+        $organisationId = $customer->organisation_id;
+        $userorganisation = $this->Organisations->findBy_Id($organisationId)->first();
+        $orgStatus = $userorganisation->active;
+        if ($orgStatus == 0){
+            $this->Flash->error(__('This organisation is now currently inactive. No items can be purchased at the moment.
+                Please contact us if you have any questions.'));
+            return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
+        } else {
 
-            $this->loadModel('Variants'); //load variant model
-            //find variant record that matches uniform ID, size and colour submitted in form.
-            $variant_record = $this->Variants->findByUniform_idAndSizeAndColour($uniform_id, $size, $colour)->first();
-            //save variant ID into cart by using the record found matching criteria
+            //check if the uniform is archived
+            $uniformID = $this->request->getData('uniform_id');
+            $uniformitem = $this->Uniforms->findBy_Id($uniformID)->first();
+            $uniformStatus = $uniformitem->status;
+
+            //if uniform is archived do not add item to cart
+            if ($uniformStatus == 0){
+                $this->Flash->error(__('This item is currently archived and cannot be purchased.'));
+                return $this->redirect($this->referer());
+            } else {
+
+            //else if uniform and organisation are not archived add item to cart
+            $cartitem = $this->Carts->newEntity();
+
+            if ($this->request->is('post')) {
+                //save values submitted in form - uniform id, colour and size
+                $uniform_id = $this->request->getData('uniform_id');
+                $colour = $this->request->getData('colour');
+                $size = $this->request->getData('size');
+
+                $this->loadModel('Variants'); //load variant model
+                //find variant record that matches uniform ID, size and colour submitted in form.
+                $variant_record = $this->Variants->findByUniform_idAndSizeAndColour($uniform_id, $size, $colour)->first();
+                //save variant ID into cart by using the record found matching criteria
 
 
-            $getItems=$this->Carts->find('all',['conditions'=>['customer_id'=>$this->Auth->user('id'),'variant_id'=>$variant_record->_id]])->toList();
+                $getItems = $this->Carts->find('all', ['conditions' => ['customer_id' => $this->Auth->user('id'), 'variant_id' => $variant_record->_id]])->toList();
 
 
+                if (sizeof($getItems) == 0) {
+                    $cartitem->variant_id = $variant_record->_id;
 
-            if(sizeof($getItems)==0  ){
-                $cartitem->variant_id = $variant_record->_id;
+                    //save all other fields into cart
+                    $cartitem->customer_id = $this->Auth->user('id');
+                    $cartitem->quantity = $this->request->getData('quantity');
+                    //save item to cart
+                    if ($this->request->getData('quantity') <= 0) {
+                        $this->Flash->error(__('You cannot add 0 quantity or less of this item to cart. Please try again.'));
+                        return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
+                    } elseif ($this->Carts->save($cartitem)) {
+                        $this->Flash->set('Item(s) successfully added to cart', ['element' => 'success']);
+                        return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
 
-                //save all other fields into cart
-                $cartitem->customer_id = $this->Auth->user('id');
-                $cartitem->quantity = $this->request->getData('quantity');
-                //save item to cart
-                if ($this->request->getData('quantity') <= 0) {
-                    $this->Flash->error(__('You cannot add 0 quantity or less of this item to cart. Please try again.'));
-                    return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
-                }
-                elseif ($this->Carts->save($cartitem)){
-                    $this->Flash->set('Item(s) successfully added to cart', ['element'=>'success']);
-                    return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
-
-                }
-                else {
-                    //if cannot save item to cart, return error message
-                    $this->Flash->error(__('Sorry, we could not save item(s) to your cart. Please try again.'));
-                }
-
-            }
-            else{
-                $cartitem2=$this->Carts->find('all',['conditions'=>['variant_id'=>$variant_record->_id]])->toList()[0];
-                $cartitem2->quantity=$cartitem2['quantity']+$this->request->getData('quantity');
-                if ($this->Carts->save($cartitem2)){
-                    $this->Flash->set('Item(s) successfully added to cart', ['element'=>'success']);
-                    return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
+                    } else {
+                        //if cannot save item to cart, return error message
+                        $this->Flash->error(__('Sorry, we could not save item(s) to your cart. Please try again.'));
+                    }
 
                 } else {
-                    //if cannot save item to cart, return error message
-                    $this->Flash->error(__('Sorry, we could not save item(s) to your cart. Please try again.'));
+                    $cartitem2 = $this->Carts->find('all', ['conditions' => ['variant_id' => $variant_record->_id]])->toList()[0];
+                    $cartitem2->quantity = $cartitem2['quantity'] + $this->request->getData('quantity');
+                    if ($this->Carts->save($cartitem2)) {
+                        $this->Flash->set('Item(s) successfully added to cart', ['element' => 'success']);
+                        return $this->redirect(['controller' => 'Carts', 'action' => 'cart']);
+
+                    } else {
+                        //if cannot save item to cart, return error message
+                        $this->Flash->error(__('Sorry, we could not save item(s) to your cart. Please try again.'));
+                    }
                 }
+
             }
-
-
+            }
         }
 
     }
@@ -268,6 +313,7 @@ class CartsController extends AppController
         $this->loadModel('Variants');
         $this->loadModel('Customers');
         $this->loadModel('Uniforms');
+        $this->loadModel('Organisations');
 
         $this->loadModel('websitecontents');
         $shipping = $this->Websitecontents->findByContentname('shipping')->first();
@@ -276,9 +322,16 @@ class CartsController extends AppController
         $this->set('shippingnumber', $shippingnumber);
 
         $customerID = $this->Auth->user('id');
+        //check there is something in cart before proceed to checkout
         $cart = $this->Carts->find('all', array('conditions' => array('Carts.customer_id' =>$customerID ,),));
-
         $count = $cart->count();
+
+        //check if organisation is currently inactive
+        $customer = $this->Customers->findById($customerID)->first();
+        $organisationId = $customer->organisation_id;
+        $userorganisation = $this->Organisations->findBy_Id($organisationId)->first();
+        $orgStatus = $userorganisation->active;
+
 
         if( $count==0) {
             $this->Flash->error(__('Please add an item to your cart first.'));
@@ -286,14 +339,21 @@ class CartsController extends AppController
         }
         else {
 
-            $products = $this->Carts->find('all', array(
-                'conditions' => array(
-                    'Carts.customer_id' => $this->Auth->user('id'),
-                ),
+            if ($orgStatus==0){
+                $this->Flash->error(__('This organisation is now currently inactive. No items can be purchased at the moment.
+                Please contact us if you have any questions.'));
+                return $this->redirect(['controller' => 'carts','action' => 'cart']);
+            } else {
 
-            ))->contain(['Variants' => ['Uniforms'], 'Customers'])->toList();
+                $products = $this->Carts->find('all', array(
+                    'conditions' => array(
+                        'Carts.customer_id' => $this->Auth->user('id'),
+                    ),
 
-            $this->set('products', $products);
+                ))->contain(['Variants' => ['Uniforms'], 'Customers'])->toList();
+
+                $this->set('products', $products);
+            }
         }
 
     }
@@ -349,9 +409,6 @@ class CartsController extends AppController
 
             if( $c  &&  $int_lenght==10  ){
 
-
-
-
             $name = $this->request->getData('name');
             $email = $this->request->getData('email');
             $phone = $this->request->getData('phone');
@@ -392,7 +449,8 @@ class CartsController extends AppController
 
                 $sum+= $product->quantity * $product['variant']->price;
             }
-            $orders->totalprice=$sum+10;
+
+            $orders->totalprice=$sum;
 
 
             if ($this->Orders->save($orders)){
@@ -578,20 +636,49 @@ class CartsController extends AppController
         $this->loadModel('Orders');
         $this->loadModel('Orderitems');
 
-        $order = $this->Orders->find('all', array('conditions' => array('Orders.paypal' =>$orderID)))->first();
-        $query = $this->Orderitems->find('all',array('conditions' => array('Orderitems.order_id' => $order->id)));
 
-        $orderitems = $query->all();
+        if(is_numeric($orderID)){
 
-        $this->set('order',$order);
-        $this->set('orderitems',$orderitems);
-        $this->deleteCart();
+            $order = $this->Orders->find('all', array('conditions' => array('Orders.id' =>$orderID)))->first();
+            $query = $this->Orderitems->find('all',array('conditions' => array('Orderitems.order_id' => $order->id)));
 
-        $this->loadModel('websitecontents');
-        $shipping = $this->Websitecontents->findByContentname('shipping')->first();
-        $shippingprice = $shipping->contentvalue;
-        $shippingnumber = (float)$shippingprice;
-        $this->set('shippingnumber', $shippingnumber);
+            $orderitems = $query->toList();
+
+          //  var_dump($orderitems);
+
+            $this->set('order',$order);
+            $this->set('orderitems',$orderitems);
+            $this->deleteCart();
+
+            $this->loadModel('websitecontents');
+            $shipping = $this->Websitecontents->findByContentname('shipping')->first();
+            $shippingprice = $shipping->contentvalue;
+            $shippingnumber = (float)$shippingprice;
+            $this->set('shippingnumber', $shippingnumber);
+
+
+        }
+        else{
+
+            $order = $this->Orders->find('all', array('conditions' => array('Orders.paypal' =>$orderID)))->first();
+            $orderitems = $this->Orderitems->find('all',array('conditions' => array('Orderitems.order_id' => $order->id)))->toList();
+
+
+           // var_dump($order->id);
+
+            $this->set('order',$order);
+            $this->set('orderitems',$orderitems);
+            $this->deleteCart();
+
+            $this->loadModel('websitecontents');
+            $shipping = $this->Websitecontents->findByContentname('shipping')->first();
+            $shippingprice = $shipping->contentvalue;
+            $shippingnumber = (float)$shippingprice;
+            $this->set('shippingnumber', $shippingnumber);
+
+        }
+
+
 
     }
 
@@ -602,6 +689,12 @@ class CartsController extends AppController
         $this->loadModel('Variants');
         $this->loadModel('Customers');
         $this->loadModel('Uniforms');
+
+        $this->loadModel('websitecontents');
+        $shipping = $this->Websitecontents->findByContentname('shipping')->first();
+        $shippingprice = $shipping->contentvalue;
+        $shippingnumber = (float)$shippingprice;
+
         $orders = $this->Orders->newEntity();
 
         $session = $this->getRequest()->getSession();
@@ -647,14 +740,68 @@ class CartsController extends AppController
         foreach($products as $product){
             $sum+= $product->quantity * $product['variant']->price;
         }
-        $orders->totalprice=$sum+10;
+        $orders->totalprice=$sum+$shippingnumber;
         if($this->Orders->save($orders)){
+
+            $this->loadModel('Orders');
+            $this->loadModel('Carts');
+            $this->loadModel('Orderitems');
+            $this->loadModel('Variants');
+            $this->loadModel('Uniforms');
+            $this->loadModel('Customers');
+
+
+            $customerID = $this->Auth->user('id');
+            $order = $this->Orders->find('all',array('conditoins' => array('Orders.customer_id' =>$customerID, 'Orders.paidstatus' => 'COMPLETED'),'order' => ['Orders.id' => 'DESC']))->first();
+            $orderID = $order->id;
+
+            $products2 = $this->Carts->find('all', array(
+                'conditions' => array(
+                    'Carts.customer_id' => $customerID,
+                ),
+            ))->contain(['Variants'=>['Uniforms'],'Customers'])->toList();
+
+            foreach($products2 as $product2){
+                $orderitems = $this->Orderitems->newEntity();
+                $orderitems->order_id=$orderID;
+                $orderitems->orderuniformname=$product2['variant']['uniform']['uniformname'];
+                $orderitems->orderprice=$product2['variant']['price'];
+                $orderitems->ordercolour=$product2['variant']['colour'];
+                $orderitems->ordersize=$product2['variant']['size'];
+                $orderitems->orderquantity=$product2['quantity'];
+                $this->Orderitems->save($orderitems);
+
+            }
+
+
+            $paidstatus = 'paid with PayPal';
+            $order->paidstatus =$paidstatus;
+            $this->Orders->save($order);
+
+
+
+            $this->sendOrderEmail($orderID);
+            $this->deleteCart($customerID);
+
+
+            $this->Flash->set('Thank you. Your order has been successfully submitted', ['element'=>'success']);
+
+            return $this->redirect(['controller' => 'Carts', 'action' => 'orderconfirmed', $orderID]);
+
+
+
+
+
             $query = $conn->newQuery();
             $query->update('orders')
                 ->set(['paypal' => $paypal_id])
                 ->where(['id' => $orders->id]);
             $stmt = $query->execute();
+
             echo "Success!";exit;
+
+
+
         } else {
             print_r($orders->errors());exit;
         }
@@ -666,17 +813,72 @@ class CartsController extends AppController
         $this->loadModel('Variants');
         $this->loadModel('Customers');
         $this->loadModel('Uniforms');
+         $this->loadModel('Organisations');
 
         $customerID = $this->Auth->user('id');
         $cart = $this->Carts->find('all', array('conditions' => array('Carts.customer_id' =>$customerID ,),));
-
         $count = $cart->count();
+
+         //check if organisation is currently inactive
+         $customer = $this->Customers->findById($customerID)->first();
+         $organisationId = $customer->organisation_id;
+         $userorganisation = $this->Organisations->findBy_Id($organisationId)->first();
+         $orgStatus = $userorganisation->active;
 
         if( $count==0) {
             $this->Flash->error(__('Please add an item to your cart first.'));
             return $this->redirect(['controller' => 'carts','action' => 'cart']);
         }
         else {
+
+            if ($orgStatus==0){
+                $this->Flash->error(__('This organisation is now currently inactive. No items can be purchased at the moment.
+                Please contact us if you have any questions.'));
+                return $this->redirect(['controller' => 'carts','action' => 'cart']);
+            } else {
+
+                $products = $this->Carts->find('all', array(
+                    'conditions' => array(
+                        'Carts.customer_id' => $this->Auth->user('id'),
+                    ),
+
+                ))->contain(['Variants' => ['Uniforms'], 'Customers'])->toList();
+
+                $this->set('products', $products);
+            }
+        }
+
+    }
+
+    public function placeorder()
+    {
+
+        //validate phone number submitted in shippinginfo.ctp first
+        $phone = $this->request->getData('phone');
+        $a = ((int)$phone);
+        $int_array = array_map('intval', str_split($phone));
+        //get the length of the array
+        $int_lenght = count($int_array);
+        $c = is_int($a);
+
+        //if phone number is valid (10 digits) then process to paypal function
+        if ($c && $int_lenght == 10) {
+
+            $this->loadModel('Variants');
+            $this->loadModel('Customers');
+            $this->loadModel('Uniforms');
+
+            $session = $this->getRequest()->getSession();
+            $session->write('name', $this->request->getData('name'));
+            $session->write('email', $this->request->getData('email'));
+            $session->write('phone', $this->request->getData('phone'));
+
+            $session->write('address', $this->request->getData('address'));
+            $session->write('suburb', $this->request->getData('suburb'));
+            $session->write('postcode', $this->request->getData('postcode'));
+
+            $session->write('state', $this->request->getData('state'));
+            $session->write('comments', $this->request->getData('comments'));
 
             $products = $this->Carts->find('all', array(
                 'conditions' => array(
@@ -686,96 +888,68 @@ class CartsController extends AppController
             ))->contain(['Variants' => ['Uniforms'], 'Customers'])->toList();
 
             $this->set('products', $products);
+
+            $this->loadModel('websitecontents');
+            $shipping = $this->Websitecontents->findByContentname('shipping')->first();
+            $shippingprice = $shipping->contentvalue;
+            $shippingnumber = (float)$shippingprice;
+            $this->set('shippingnumber', $shippingnumber);
+
+        } else {
+            $this->Flash->error(__('Please enter a valid Australian phone number.'));
+            return $this->redirect($this->referer());
         }
-
     }
 
-    public function placeorder(){
-
-        $this->loadModel('Variants');
-        $this->loadModel('Customers');
-        $this->loadModel('Uniforms');
-
-        $session = $this->getRequest()->getSession();
-        $session->write('name',$this->request->getData('name'));
-        $session->write('email',$this->request->getData('email'));
-        $session->write('phone',$this->request->getData('phone'));
-
-        $session->write('address',$this->request->getData('address'));
-        $session->write('suburb',$this->request->getData('suburb'));
-        $session->write('postcode',$this->request->getData('postcode'));
-
-        $session->write('state',$this->request->getData('state'));
-        $session->write('comments',$this->request->getData('comments'));
-
-        $products = $this->Carts->find('all', array(
-            'conditions' => array(
-                'Carts.customer_id' => $this->Auth->user('id'),
-            ),
-
-        ))->contain(['Variants'=>['Uniforms'],'Customers'])->toList();
-
-        $this->set('products',$products);
-
-        $this->loadModel('websitecontents');
-        $shipping = $this->Websitecontents->findByContentname('shipping')->first();
-        $shippingprice = $shipping->contentvalue;
-        $shippingnumber = (float)$shippingprice;
-        $this->set('shippingnumber', $shippingnumber);
-
-
-
-    }
-
-    public function saveorderitems(){
-
-        $this->loadModel('Orders');
-        $this->loadModel('Carts');
-        $this->loadModel('Orderitems');
-        $this->loadModel('Variants');
-        $this->loadModel('Uniforms');
-        $this->loadModel('Customers');
-
-
-        $customerID = $this->Auth->user('id');
-        $order = $this->Orders->find('all',array('conditoins' => array('Orders.customer_id' =>$customerID, 'Order.paidstatus' => 'pending'),'order' => ['Orders.id' => 'DESC']))->first();
-        $orderID = $order->id;
-
-        $products2 = $this->Carts->find('all', array(
-            'conditions' => array(
-                'Carts.customer_id' => $customerID,
-            ),
-        ))->contain(['Variants'=>['Uniforms'],'Customers'])->toList();
-
-        foreach($products2 as $product2){
-            $orderitems = $this->Orderitems->newEntity();
-            $orderitems->order_id=$orderID;
-            $orderitems->orderuniformname=$product2['variant']['uniform']['uniformname'];
-            $orderitems->orderprice=$product2['variant']['price'];
-            $orderitems->ordercolour=$product2['variant']['colour'];
-            $orderitems->ordersize=$product2['variant']['size'];
-            $orderitems->orderquantity=$product2['quantity'];
-            $this->Orderitems->save($orderitems);
-            $this->set('userid',$this->Auth->user('id'));
-        }
-
-
-        $paidstatus = 'paid with PayPal';
-        $order->paidstatus =$paidstatus;
-        $this->Orders->save($order);
-
-
-
-        $this->sendOrderEmail($orderID);
-        $this->deleteCart($customerID);
-
-
-        $this->Flash->set('Thank you. Your order has been successfully submitted', ['element'=>'success']);
-
-        return $this->redirect(['controller' => 'Carts', 'action' => 'orderconfirmed', $orderID]);
-
-
-
-    }
+//    public function saveorderitems(){
+//
+//        $this->loadModel('Orders');
+//        $this->loadModel('Carts');
+//        $this->loadModel('Orderitems');
+//        $this->loadModel('Variants');
+//        $this->loadModel('Uniforms');
+//        $this->loadModel('Customers');
+//
+//
+//        $customerID = $this->Auth->user('id');
+//        $order = $this->Orders->find('all',array('conditoins' => array('Orders.customer_id' =>$customerID, 'Orders.paidstatus' => 'COMPLETED'),'order' => ['Orders.id' => 'DESC']))->first();
+//        $orderID = $order->id;
+//var_dump($orderID);
+//        $products2 = $this->Carts->find('all', array(
+//            'conditions' => array(
+//                'Carts.customer_id' => $customerID,
+//            ),
+//        ))->contain(['Variants'=>['Uniforms'],'Customers'])->toList();
+//
+//        foreach($products2 as $product2){
+//            $orderitems = $this->Orderitems->newEntity();
+//            $orderitems->order_id=$orderID;
+//            $orderitems->orderuniformname=$product2['variant']['uniform']['uniformname'];
+//            $orderitems->orderprice=$product2['variant']['price'];
+//            $orderitems->ordercolour=$product2['variant']['colour'];
+//            $orderitems->ordersize=$product2['variant']['size'];
+//            $orderitems->orderquantity=$product2['quantity'];
+//            $this->Orderitems->save();
+//
+//        }
+//
+//
+//        $paidstatus = 'paid with PayPal';
+//        $order->paidstatus =$paidstatus;
+//        $this->Orders->save();
+//
+//
+//
+//        $this->sendOrderEmail($orderID);
+//        $this->deleteCart($customerID);
+//
+//
+//        $this->Flash->set('Thank you. Your order has been successfully submitted', ['element'=>'success']);
+//
+//        return $this->redirect(['controller' => 'Carts', 'action' => 'orderconfirmed', $orderID]);
+//
+//
+//
+//    }
 
 }

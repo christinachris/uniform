@@ -425,11 +425,19 @@
                                         <?php } ?>
                                 </table>
                                 <br>
-                                    <b>Shipping:</b> $<?php echo $this->Number->precision($shippingnumber,2)  ?>
+                                    <b>Shipping:</b> $<?php
+                                    if ($paymentstatus !== 'bypassed online payment - requires invoice') {
+                                        echo $this->Number->precision($shippingnumber,2) ;
+                                    } else {
+                                        echo $this->Number->precision(0,2);
+                                    } ?>
                                 <br>
-                                    <b>Order Total: </b> $<?php echo $this->Number->precision($sum+$shippingnumber,2) ?>
-
-
+                                    <b>Order Total: </b> $<?php
+                                    if ($paymentstatus !== 'bypassed online payment - requires invoice') {
+                                    echo $this->Number->precision($sum + $shippingnumber, 2);
+                                    } else {
+                                    echo $this->Number->precision($sum,2);
+                                    }?>
 
                         </td>
                     </tr>

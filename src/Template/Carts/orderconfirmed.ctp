@@ -34,9 +34,7 @@
         <div class="form-group">
             <b style="color: #262261;">Contact Phone</b>
             <p> <?= ($order->phone) ?><br/>
-
         </div>
-
     </div>
 </div>
 
@@ -99,11 +97,22 @@
 
             <div class="shipping">
                 <div class="shipping-title" style="padding: 10px 10px;">Shipping</div>
-                <div class="shipping-value" id="basket-shipping" style="padding: 10px 10px;"><?php echo $this->Number->precision($shippingnumber,2) ?></div>
+                <div class="shipping-value" id="basket-shipping" style="padding: 10px 10px;"><?php
+                    if ($order->paidstatus !== 'bypassed online payment - requires invoice') {
+                        echo $this->Number->precision($shippingnumber, 2);
+                    } else {
+                        echo $this->Number->precision(0,2);
+                    }?>
+                </div>
             </div>
             <div class="summary-total">
                 <div class="total-title" style="padding: 10px 10px;"><b>Total</b></div>
-                <div class="total-value final-value" id="basket-total"style="padding: 10px 10px"><?php echo $this->Number->precision($sum+$shippingnumber,2) ?></div>
+                <div class="total-value final-value" id="basket-total"style="padding: 10px 10px"><?php
+                    if ($order->paidstatus !== 'bypassed online payment - requires invoice') {
+                        echo $this->Number->precision($sum + $shippingnumber, 2);
+                    } else {
+                        echo $this->Number->precision($sum,2);
+                    }?></div>
             </div>
         </div>
 

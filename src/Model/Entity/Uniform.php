@@ -14,6 +14,7 @@ use Cake\ORM\Entity;
  * @property string $gender
  * @property string|null $heroimagepath
  * @property string|null $sizechartpath
+ * @property bool $status
  *
  * @property \App\Model\Entity\Organisation $organisation
  * @property \App\Model\Entity\Picture[] $pictures
@@ -38,6 +39,7 @@ class Uniform extends Entity
         'gender' => true,
         'heroimagepath' => true,
         'sizechartpath' => true,
+        'status' => true,
         'organisation' => true,
         'pictures' => true,
         'variants' => true

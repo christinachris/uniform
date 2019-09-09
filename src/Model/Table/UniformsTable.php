@@ -38,8 +38,6 @@ class UniformsTable extends Table
         $this->setDisplayField('_id');
         $this->setPrimaryKey('_id');
 
-
-
         $this->belongsTo('Organisations', [
             'foreignKey' => 'organisation_id'
         ]);
@@ -89,11 +87,17 @@ class UniformsTable extends Table
 
         $validator
             ->scalar('heroimagepath')
+            ->maxLength('heroimagepath', 300)
             ->allowEmptyFile('heroimagepath');
 
         $validator
             ->scalar('sizechartpath')
             ->allowEmptyString('sizechartpath');
+
+        $validator
+            ->boolean('status')
+            ->requirePresence('status', 'create')
+            ->allowEmptyString('status', false);
 
         return $validator;
     }

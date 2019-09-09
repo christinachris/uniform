@@ -1,16 +1,11 @@
 <div class="card-header">
     <div class="row">
-        <div class="col-lg-8 col-md-6 col-sm-4">
+        <div class="col-lg-9 col-md-6 col-sm-4">
             <h3>Order No. <?= h($order->id) ?></h3>
         </div>
-        <div class="lg-col-4 btn pull-right">
-            <?php echo $this->Html->link('Admin Dashboard', ['controller'=>'Admins', 'action'=>'admindashboard'], ['escape' => false, 'class' => 'btn btn-link']); ?>
+        <div class="lg-col-3">
+            <?php echo $this->Html->link('< Back to Orders List', ['controller'=>'Admins', 'action'=>'orderlist'], ['escape' => false, 'class' => 'btn btn-outline-dark']); ?>
         </div>
-    </div>
-    <div class="row">
-    <div class="lg-col-4 btn pull-right">
-        <?php echo $this->Html->link('< Back to Orders List', ['controller'=>'Admins', 'action'=>'orderlist'], ['escape' => false, 'class' => 'btn btn-outline-dark']); ?>
-    </div>
     </div>
 </div>
 
@@ -20,11 +15,13 @@
     <div class="card">
         <div class="card-header">
             <div class="row">
-                <div class="col-lg-8 col-md-6 col-sm-4">
+                <div class="col-lg-9 col-md-6 col-sm-4">
                     <h3>Order Details</h3>
-                    <?php echo $this->Html->link('Edit Order',
-                            ['controller'=>'Admins', 'action'=>'orderedit',$order->id],
-                            ['escape' => false, 'class' => 'btn btn-primary']); ?>
+                </div>
+                <div class="col-lg-3">
+                <?php echo $this->Html->link('Edit Order',
+                    ['controller'=>'Admins', 'action'=>'orderedit', $order->id],
+                    ['escape' => false, 'class' => 'btn btn-primary']); ?>
                 </div>
             </div>
         </div>
@@ -33,6 +30,10 @@
             <div class="form-group">
                 <b style="color: #262261;">Order Number</b>
                 <p><?= h($order->id) ?></p>
+            </div>
+            <div class="form-group">
+                <b style="color: #262261;">PayPal Reference Number</b>
+                <p><?= h($order->paypal) ?></p>
             </div>
             <div class="form-group">
                 <b style="color: #262261;">Order Date</b>

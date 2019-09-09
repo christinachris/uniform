@@ -3,14 +3,6 @@
         <div class="col-lg-8 col-md-6 col-sm-4">
             <h3>Order No. <?= h($order->id) ?></h3>
         </div>
-        <div class="lg-col-4 btn pull-right">
-            <?php echo $this->Html->link('Admin Dashboard', ['controller'=>'Admins', 'action'=>'admindashboard'], ['escape' => false, 'class' => 'btn btn-link']); ?>
-        </div>
-    </div>
-    <div class="row">
-        <div class="lg-col-4 btn pull-right">
-            <?php echo $this->Html->link('< Cancel Edit', ['controller'=>'Admins', 'action'=>'orderdetails', $order->id], ['escape' => false, 'class' => 'btn btn-outline-dark']); ?>
-        </div>
     </div>
 </div>
 
@@ -78,8 +70,11 @@
                 <p>$ <?= h($this->Number->precision($order->totalprice,2)) ?></p>
             </div>
 
-            <?php echo $this->Form->submit('Save', ['class'=>'btn btn-outline-success btn-block']); ?>
+            <?php echo $this->Form->submit('Save Changes', ['class'=>'btn btn-outline-success btn-block']); ?>
             <?php echo $this->Form->end(); ?>
+            <br>
+            <?php echo $this->Html->link('Cancel Edit', ['controller'=>'Admins', 'action'=>'orderdetails', $order->id], ['escape' => false, 'class' => 'btn btn-outline-danger btn-block']); ?>
+            </div>
         </div>
     </div>
 

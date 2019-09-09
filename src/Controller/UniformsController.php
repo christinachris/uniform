@@ -129,8 +129,9 @@ class UniformsController extends AppController
         $this->loadModel('Organisations');
         $this->loadModel('Variants');
 
+        $condition = [['organisation_id'=>$oid],['status'=> 1]];
+        $Uniform = $this -> Uniforms ->find()->where($condition);
 
-        $Uniform = $this -> Uniforms ->find()->where(['organisation_id'=>$oid]);
 
         $variant = $this->Variants->find('all');
         //var_dump($variant);
@@ -196,7 +197,6 @@ class UniformsController extends AppController
 
     public function showuniformdetail($id=0){
         $this->loadModel('Variants');
-        $variant = $this->Variants->find('all');
 
         $this->loadModel('pictures');
         $picture = $this->pictures->find('all')->where(['uniform_id'=>$id]);

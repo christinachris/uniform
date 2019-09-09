@@ -10,7 +10,7 @@
         </div>
         <div class="col-lg-4">
             <?php echo $this->Html->link('< Back to organisation list',
-                    ['controller'=>'Admins', 'action'=>'variantlist'],
+                    ['controller'=>'Admins', 'action'=>'organisationlist'],
                     ['escape' => false, 'class' => 'btn btn-outline-secondary']); ?>
         </div>
     </div>
@@ -28,6 +28,9 @@
     </div>
     <div class="form-group">
         <label>Bypass code</label><?php echo $this->Form->bypasscode('bypasscode', ['class'=>'form-control', 'required']) ?>
+    </div>
+    <div class="form-group">
+        <label style="padding-right: 10px">Organisation Status </label><?php echo $this->Form->select('active', $statusSelect);?>
     </div>
     <div class="form-group">
         <label>Logo</label><?php echo $this->Form->logopath('logopath', ['class'=>'form-control', 'required']) ?>

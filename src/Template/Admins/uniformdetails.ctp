@@ -9,8 +9,7 @@
             <div class="col-lg-8 col-md-6 col-sm-4">
                 <h3><?php echo $uniform->uniformname ?></h3>
                 <p><?php echo $orgname ?></p>
-                <?php echo $this->Html->link('Admin Dashboard', ['controller'=>'Admins', 'action'=>'admindashboard'],
-                    ['class' => 'btn btn-link']); ?>
+
             </div>
             <div class="col-lg-4">
                 <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('< Back to '.$orgname .' details') . '</span>',
@@ -30,18 +29,16 @@
                 ['controller'=>'Admins', 'action'=>'uniformedit',$uniform->_id],
                 ['escape' => false, 'class' => 'btn btn-primary']); ?>
 
-            <?php echo $this->Html->link('Delete Uniform',
-                ['controller'=>'Admins', 'action'=>'uniformdelete',$uniform->_id],
-                ['confirm'=>'Are you sure you want to delete this uniform? It will delete all related uniform variants',
-                    'escape' => false, 'class' => 'btn btn-danger']); ?>
-
             <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('See Variants') . '</span>',
                 ['controller'=>'admins', 'action'=>'variantlist',$uniform->_id],
                 ['escape' => false, 'class' => 'btn btn-dark']); ?>
         </div>
         <br>
 
-
+        <div class="form-group">
+            <b style="color: #262261;">Uniform Status</b>
+            <p><?= ($activeStatus) ?></p>
+        </div>
         <div class="form-group">
             <b style="color: #262261;">Type</b>
             <p><?= h($uniform->type) ?></p>

@@ -6,9 +6,6 @@
         <div class="row">
             <div class="col-lg-8 col-md-6 col-sm-4">
                 <h3><?php echo $organisation->organisationname ?></h3>
-                <?php echo $this->Html->link('Admin Dashboard', ['controller'=>'Admins', 'action'=>'admindashboard'],
-                        ['escape' => false, 'class' => 'btn btn-link']); ?>
-
             </div>
             <div class="col-lg-4">
                 <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('< Back to Organisation List') . '</span>',
@@ -24,15 +21,16 @@
                 ['controller'=>'Admins', 'action'=>'organisationedit',$organisation->_id],
                 ['escape' => false, 'class' => 'btn btn-primary']); ?>
 
-            <?php echo $this->Html->link('Delete Organisation',
-                ['controller'=>'Admins', 'action'=>'organisationdelete',$organisation->_id],
-                ['confirm'=>'Are you sure you want to delete this organisation?','class' => 'btn btn-danger']); ?>
 
             <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('See Uniforms') . '</span>',
                 ['controller'=>'admins', 'action'=>'uniformlist',$organisation->_id],
                 ['escape' => false, 'class' => 'btn btn-dark']); ?>
         </div>
         <br>
+        <div class="form-group">
+            <b style="color: #262261;">Organisation Status</b>
+            <p><?= ($activeStatus) ?></p>
+        </div>
         <div class="form-group">
             <b style="color: #262261;">Logo</b>
             <div class="product-image" style="float: none">
@@ -46,10 +44,8 @@
         </div>
         <div class="form-group">
             <b style="color: #262261;">Bypasscode</b>
-            <p><?= h($organisation->bypasscode) ?></p>
+            <p><?= ($organisation->bypasscode) ?></p>
         </div>
-
-
 
     </div>
 </div>

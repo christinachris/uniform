@@ -86,7 +86,7 @@
                                     <li><?= $this->Html->link( $getintouch   , '/pages/getintouch' );?></li>
                                     <!-- only show my account drop down with options if customer is logged in-->
                                     <li> <?php if($this->request->getSession()->read('Auth')){
-                                            echo  $this->Html->link( 'My Account', [] );
+                                            echo  $this->Html->link( 'My Account', ['controller'=>'customers', 'action'=>'viewaccount'] );
                                         } ?>
                                         <ul class="dropdown">
                                             <li>  <?php if($this->request->getSession()->read('Auth')){
