@@ -399,7 +399,7 @@ class PostgresSchema extends BaseSchema
                 $type = ' CHAR';
             }
             $out .= $type;
-            if (isset($data['length'])) {
+            if (isset($data['length']) && $data['length'] != 36) {
                 $out .= '(' . (int)$data['length'] . ')';
             }
         }

@@ -41,14 +41,12 @@ class CachePanel extends DebugPanel
             $config = Cache::getConfig($name);
             if (isset($config['className']) && $config['className'] instanceof DebugEngine) {
                 $instance = $config['className'];
-            } elseif (isset($config['className'])) {
+            } else {
                 Cache::drop($name);
                 $instance = new DebugEngine($config);
                 Cache::setConfig($name, $instance);
             }
-            if (isset($instance)) {
-                $this->_instances[$name] = $instance;
-            }
+            $this->_instances[$name] = $instance;
         }
     }
 

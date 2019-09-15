@@ -70,7 +70,6 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
-            'Prophecy\\' => 9,
             'PhpParser\\' => 10,
             'Phinx\\' => 6,
         ),
@@ -79,9 +78,15 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
             'Migrations\\' => 11,
             'M1\\Env\\' => 7,
         ),
+        'L' => 
+        array (
+            'League\\Flysystem\\' => 17,
+        ),
         'J' => 
         array (
             'JsonSchema\\' => 11,
+            'Josegonzalez\\Upload\\Test\\Fixture\\' => 33,
+            'Josegonzalez\\Upload\\' => 20,
             'Jasny\\Twig\\' => 11,
             'JakubOnderka\\PhpConsoleHighlighter\\' => 35,
             'JakubOnderka\\PhpConsoleColor\\' => 29,
@@ -210,10 +215,6 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
         array (
             0 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Prophecy\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
-        ),
         'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
@@ -230,9 +231,21 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
         array (
             0 => __DIR__ . '/..' . '/m1/env/src',
         ),
+        'League\\Flysystem\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/flysystem/src',
+        ),
         'JsonSchema\\' => 
         array (
             0 => __DIR__ . '/..' . '/justinrainbow/json-schema/src/JsonSchema',
+        ),
+        'Josegonzalez\\Upload\\Test\\Fixture\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/josegonzalez/cakephp-upload/tests/Fixture',
+        ),
+        'Josegonzalez\\Upload\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/josegonzalez/cakephp-upload/src',
         ),
         'Jasny\\Twig\\' => 
         array (
@@ -353,6 +366,10 @@ class ComposerStaticInit1d6c3d80f786c68f1f33a0bdc8162e6e
         ),
         'P' => 
         array (
+            'Prophecy\\' => 
+            array (
+                0 => __DIR__ . '/..' . '/phpspec/prophecy/src',
+            ),
             'PayPal' => 
             array (
                 0 => __DIR__ . '/..' . '/paypal/rest-api-sdk-php/lib',

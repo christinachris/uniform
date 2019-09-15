@@ -108,11 +108,10 @@ trait RequestActionTrait
         if (empty($url)) {
             return false;
         }
-        $isReturn = array_search('return', $extra, true);
-        if ($isReturn !== false) {
+        if (($index = array_search('return', $extra)) !== false) {
             $extra['return'] = 0;
             $extra['autoRender'] = 1;
-            unset($extra[$isReturn]);
+            unset($extra[$index]);
         }
         $extra += ['autoRender' => 0, 'return' => 1, 'bare' => 1, 'requested' => 1];
 

@@ -28,9 +28,6 @@ use Iterator;
  * This class implements the Iterator interface to allow plugins
  * to be iterated, handling the situation where a plugin's hook
  * method (usually bootstrap) loads another plugin during iteration.
- *
- * While its implementation supported nested iteration it does not
- * support using `continue` or `break` inside loops.
  */
 class PluginCollection implements Iterator, Countable
 {
@@ -49,18 +46,11 @@ class PluginCollection implements Iterator, Countable
     protected $names = [];
 
     /**
-     * Iterator position stack.
-     *
-     * @var int[]
-     */
-    protected $positions = [];
-
-    /**
-     * Loop depth
+     * Iterator position.
      *
      * @var int
      */
-    protected $loopDepth = -1;
+    protected $position = 0;
 
     /**
      * Constructor
@@ -176,9 +166,6 @@ class PluginCollection implements Iterator, Countable
     public function clear()
     {
         $this->plugins = [];
-        $this->names = [];
-        $this->positions = [];
-        $this->loopDepth = -1;
 
         return $this;
     }
@@ -211,25 +198,13 @@ class PluginCollection implements Iterator, Countable
     }
 
     /**
-     * Implementation of Countable.
-     *
-     * Get the number of plugins in the collection.
-     *
-     * @return int
-     */
-    public function count()
-    {
-        return count($this->plugins);
-    }
-
-    /**
      * Part of Iterator Interface
      *
      * @return void
      */
     public function next()
     {
-        $this->positions[$this->loopDepth]++;
+        $this->position++;
     }
 
     /**
@@ -239,7 +214,7 @@ class PluginCollection implements Iterator, Countable
      */
     public function key()
     {
-        return $this->names[$this->positions[$this->loopDepth]];
+        return $this->names[$this->position];
     }
 
     /**
@@ -249,8 +224,7 @@ class PluginCollection implements Iterator, Countable
      */
     public function current()
     {
-        $position = $this->positions[$this->loopDepth];
-        $name = $this->names[$position];
+        $name = $this->names[$this->position];
 
         return $this->plugins[$name];
     }
@@ -262,8 +236,7 @@ class PluginCollection implements Iterator, Countable
      */
     public function rewind()
     {
-        $this->positions[] = 0;
-        $this->loopDepth += 1;
+        $this->position = 0;
     }
 
     /**
@@ -273,13 +246,19 @@ class PluginCollection implements Iterator, Countable
      */
     public function valid()
     {
-        $valid = isset($this->names[$this->positions[$this->loopDepth]]);
-        if (!$valid) {
-            array_pop($this->positions);
-            $this->loopDepth -= 1;
-        }
+        return $this->position < count($this->plugins);
+    }
 
-        return $valid;
+    /**
+     * Implementation of Countable.
+     *
+     * Get the number of plugins in the collection.
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return count($this->plugins);
     }
 
     /**

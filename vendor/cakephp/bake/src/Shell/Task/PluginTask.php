@@ -29,6 +29,13 @@ use Cake\Utility\Inflector;
 class PluginTask extends BakeTask
 {
     /**
+     * Path to the bootstrap file. Changed in tests.
+     *
+     * @var string
+     */
+    public $bootstrap = null;
+
+    /**
      * Tasks this task uses.
      *
      * @var array
@@ -52,6 +59,7 @@ class PluginTask extends BakeTask
     public function initialize()
     {
         $this->path = current(App::path('Plugin'));
+        $this->bootstrap = ROOT . DS . 'config' . DS . 'bootstrap.php';
     }
 
     /**
@@ -109,8 +117,8 @@ class PluginTask extends BakeTask
 
         $this->_generateFiles($plugin, $this->path);
 
-        $this->_modifyAutoloader($plugin, $this->path);
-        $this->_modifyApplication($plugin);
+        $hasAutoloader = $this->_modifyAutoloader($plugin, $this->path);
+        $this->_modifyBootstrap($plugin, $hasAutoloader);
 
         $this->hr();
         $this->out(sprintf('<success>Created:</success> %s in %s', $plugin, $this->path . $plugin), 2);
@@ -122,22 +130,32 @@ class PluginTask extends BakeTask
     }
 
     /**
-     * Modify the application class
+     * Update the app's bootstrap.php file.
      *
      * @param string $plugin Name of plugin
+     * @param bool $hasAutoloader Whether or not there is an autoloader configured for
      * the plugin
      * @return void
      */
-    protected function _modifyApplication($plugin)
+    protected function _modifyBootstrap($plugin, $hasAutoloader)
     {
-        $application = new File(ROOT . DS . 'src' . DS . 'Application.php', false);
-        if (!$application->exists()) {
-            $this->err('<warning>Could not update application Application.php file, as it could not be found.</warning>');
+        $bootstrap = new File($this->bootstrap, false);
+        if (!$bootstrap->exists()) {
+            $this->err('<warning>Could not update application bootstrap.php file, as it could not be found.</warning>');
 
             return;
         }
-
-        $this->dispatchShell('plugin', 'load', $plugin);
+        $contents = $bootstrap->read();
+        if (!preg_match("@\n\s*Plugin::loadAll@", $contents)) {
+            $autoload = $hasAutoloader ? null : "'autoload' => true, ";
+            $bootstrap->append(sprintf(
+                "\nPlugin::load('%s', [%s'bootstrap' => false, 'routes' => true]);\n",
+                $plugin,
+                $autoload
+            ));
+            $this->out('');
+            $this->out(sprintf('%s modified', $this->bootstrap));
+        }
     }
 
     /**

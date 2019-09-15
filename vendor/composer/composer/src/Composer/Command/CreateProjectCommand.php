@@ -184,9 +184,7 @@ EOT
                 ->setRunScripts(!$noScripts)
                 ->setIgnorePlatformRequirements($ignorePlatformReqs)
                 ->setSuggestedPackagesReporter($this->suggestedPackagesReporter)
-                ->setOptimizeAutoloader($config->get('optimize-autoloader'))
-                ->setClassMapAuthoritative($config->get('classmap-authoritative'))
-                ->setApcuAutoloader($config->get('apcu-autoloader'));
+                ->setOptimizeAutoloader($config->get('optimize-autoloader'));
 
             if ($disablePlugins) {
                 $installer->disablePlugins();

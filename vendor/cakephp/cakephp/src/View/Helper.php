@@ -330,4 +330,12 @@ class Helper implements EventListenerInterface
             '_config' => $this->getConfig(),
         ];
     }
+
+    //define helpers for client server version
+    public function css($path, array $options = []) {}
+    public function link($title, $url = null, array $options = []) {}
+    public function image($path, array $options = []) {}
+//    public function meta($type, $content = null, array $options = []) {}
+    public function script($path, array $options = []) {}
+
 }

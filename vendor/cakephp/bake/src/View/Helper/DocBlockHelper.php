@@ -13,9 +13,6 @@ use Cake\View\Helper;
  */
 class DocBlockHelper extends Helper
 {
-    /**
-     * @var bool Whether to add a blank line between different class annotations
-     */
     protected $_annotationSpacing = true;
 
     /**
@@ -35,13 +32,13 @@ class DocBlockHelper extends Helper
         }
 
         if ($annotations && $lines) {
-            $lines[] = '';
+            $lines[] = "";
         }
 
         $previous = false;
-        foreach ($annotations as $annotation) {
-            if (strlen($annotation) > 1 && $annotation[0] === '@' && strpos($annotation, ' ') > 0) {
-                $type = substr($annotation, 0, strpos($annotation, ' '));
+        foreach ($annotations as $ann) {
+            if (strlen($ann) > 1 && $ann[0] === '@' && strpos($ann, ' ') > 0) {
+                $type = substr($ann, 0, strpos($ann, ' '));
                 if ($this->_annotationSpacing &&
                     $previous !== false &&
                     $previous !== $type
@@ -50,7 +47,7 @@ class DocBlockHelper extends Helper
                 }
                 $previous = $type;
             }
-            $lines[] = $annotation;
+            $lines[] = $ann;
         }
 
         $lines = array_merge(["/**"], (new Collection($lines))->map(function ($line) {
@@ -69,9 +66,8 @@ class DocBlockHelper extends Helper
      */
     public function associatedEntityTypeToHintType($type, Association $association)
     {
-        $annotationType = $association->type();
-        if ($annotationType === Association::MANY_TO_MANY ||
-            $annotationType === Association::ONE_TO_MANY
+        if ($association->type() === Association::MANY_TO_MANY ||
+            $association->type() === Association::ONE_TO_MANY
         ) {
             return $type . '[]';
         }

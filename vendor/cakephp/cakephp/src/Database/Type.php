@@ -138,7 +138,6 @@ class Type implements TypeInterface
     public static function set($name, Type $instance)
     {
         static::$_builtTypes[$name] = $instance;
-        static::$_types[$name] = get_class($instance);
     }
 
     /**
