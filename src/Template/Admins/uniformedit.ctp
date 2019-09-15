@@ -5,8 +5,19 @@
 <div class="card">
     <?= $this->Form->create($uniform,['url' => ['controller' => 'admins', 'action' => 'uniformedit']]); ?>
     <div class="card-header">
-        <h3> Edit Uniform </h3>
-        <p> <?php echo $orgname ?></p>
+        <div class="row">
+            <div class="col-lg-8 col-md-6 col-sm-4">
+                <h3>Edit uniform item <?php echo $uniform->uniformname ?></h3>
+            </div>
+            <div class="col-lg-4">
+                <?php echo $this->Html->link('Edit Pictures',
+                    ['controller'=>'Admins', 'action'=>'uniformimageedit',$uniform->_id],
+                    ['escape' => false, 'class' => 'btn btn-primary']); ?>
+            </div>
+            <div class="col-lg-8 col-md-6 col-sm-4">
+            <p> <?php echo $orgname ?></p>
+            </div>
+        </div>
     </div>
 
     <div class="card-body">
@@ -17,7 +28,7 @@
             <label>Uniform Name</label><?php echo $this->Form->name('uniformname', ['class'=>'form-control', 'required']) ?>
         </div>
         <div class="form-group">
-            <label>Type</label><?php echo $this->Form->type('type', ['class'=>'form-control', 'required']) ?>
+            <label>Type</label><?php echo $this->Form->uniformType('uniformType', ['class'=>'form-control', 'required']) ?>
         </div>
         <div class="form-group">
             <label>Gender</label><?php echo $this->Form->gender('gender', ['class'=>'form-control', 'required']) ?>
@@ -25,6 +36,8 @@
         <div class="form-group">
             <label>Description</label><?php echo $this->Form->textarea('uniformdescription', ['class'=>'form-control', 'required']) ?>
         </div>
+
+
     </div>
 
     <div class="col-lg-4">

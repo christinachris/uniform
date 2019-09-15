@@ -28,7 +28,7 @@
             <div class="item">
                 <div class="product-image">
                     <!--<?php var_dump($product['variant']); ?>-->
-                    <?php echo $this->Html->image($product['variant']['uniform']->heroimagepath,['class'=>'product-frame']);?>
+                    <?php echo $this->Html->image("../files/uniforms/heroimagepath/{$product['variant']['uniform']->heroimagepath}")?>
                 </div>
                 <div class="product-details">
                     <h5><strong><span class="item-quantity"><?php echo $product->quantity ?></span> x <?php echo $product['variant']['uniform']->uniformname; ?></strong></h5>

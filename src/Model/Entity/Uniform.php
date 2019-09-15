@@ -9,11 +9,11 @@ use Cake\ORM\Entity;
  * @property int $_id
  * @property int|null $organisation_id
  * @property string $uniformname
- * @property string $type
+ * @property string $uniformType
  * @property string $uniformdescription
  * @property string $gender
- * @property string|null $heroimagepath
- * @property string|null $sizechartpath
+ * @property |null $heroimagepath
+ * @property |null $sizechartpath
  * @property bool $status
  *
  * @property \App\Model\Entity\Organisation $organisation
@@ -34,7 +34,7 @@ class Uniform extends Entity
     protected $_accessible = [
         'organisation_id' => true,
         'uniformname' => true,
-        'type' => true,
+        'uniformType' => true,
         'uniformdescription' => true,
         'gender' => true,
         'heroimagepath' => true,

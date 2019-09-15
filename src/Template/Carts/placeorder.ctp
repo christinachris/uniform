@@ -13,17 +13,17 @@
                 </div>
                 <?php $sum=0; ?>
                 <?php foreach($products as $product){ ?>
-                <div class="basket-product">
-                    <div class="item">
-                        <div class="product-details">
-                            <h5><strong><span class="item-quantity"><?php echo $product->quantity ?></span> x <?php echo $product['variant']['uniform']->uniformname; ?></strong></h5>
-                            <p><strong> <?php echo $product['variant']->colour.', Size '. $product['variant']->size; ?></strong></p>
+                    <div class="basket-product">
+                        <div class="item">
+                            <div class="product-details">
+                                <h5><strong><span class="item-quantity"><?php echo $product->quantity ?></span> x <?php echo $product['variant']['uniform']->uniformname; ?></strong></h5>
+                                <p><strong> <?php echo $product['variant']->colour.', Size '. $product['variant']->size; ?></strong></p>
+                            </div>
                         </div>
+                        <div class="price"><?php echo $this->Number->precision($product['variant']->price,2) ?></div>
+                        <div class="subtotal"><?php echo $this->Number->precision($product->quantity * $product['variant']->price,2) ?></div>
                     </div>
-                    <div class="price"><?php echo $this->Number->precision($product['variant']->price,2) ?></div>
-                    <div class="subtotal"><?php echo $this->Number->precision($product->quantity * $product['variant']->price,2) ?></div>
-                </div>
-                <?php $sum+= $product->quantity * $product['variant']->price; ?>
+                    <?php $sum+= $product->quantity * $product['variant']->price; ?>
                 <?php } ?>
             </div>
 

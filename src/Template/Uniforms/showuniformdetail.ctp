@@ -19,9 +19,13 @@
 
                     <?php   $this->Form->link($uniform->heroimagepath) ;?>
 
-                    <div class="thumbs_style"> <?php echo $this->Html->image($uniform->heroimagepath, ['alt' => 'CakePHP','class'=>'img2']);?> </div>
+                    <div class="thumbs_style"> <?php echo $this->Html->image("../files/uniforms/heroimagepath/{$uniform->heroimagepath}")?> </div>
+
+
                         <?php foreach($picture as $pictures){ ?>
-                    <div class="thumbs_style"><?php echo $this->Html->image($pictures->extraphotopath, ['alt' => 'CakePHP','class'=>'img2']);?></div>
+
+                            <div class="thumbs_style"> <?php echo $this->Html->image("../files/uniforms/heroimagepath/{$pictures['extraphotopath']}")?> </div>
+
                     <?php } ?>
                 </div>
             </div>
@@ -121,7 +125,7 @@
             <?php if(empty($uniform->sizechartpath)){ ?>
             <?php }
             else { ?>
-                <?php echo $this->Html->image($uniform->sizechartpath, ['alt' => 'CakePHP']);?>
+                    <?php echo $this->Html->image("../files/uniforms/sizechartpath/{$uniform->sizechartpath}")?>
             <?php } ?>
 
         </div>
@@ -157,7 +161,7 @@
 
     $(document).ready(function() {
 
-        var name='<?php echo $this->Html->image($uniform->heroimagepath);?>';
+        var name='<?php echo $this->Html->image("../files/uniforms/heroimagepath/{$uniform->heroimagepath}");?>';
         var index = 0;
         var image_address, list, loop, last_index;
         var scroll_position = 0;
@@ -165,7 +169,7 @@
         var status = 'on';
 
         $('.thumbs_style img').first().css('border', '2px solid #262261');
-        $('#image').html('<?php echo $this->Html->image($uniform->heroimagepath);?> ');
+        $('#image').html('<?php echo $this->Html->image("../files/uniforms/heroimagepath/{$uniform->heroimagepath}");?> ');
 
         loop = setInterval(slider, 10000);
 

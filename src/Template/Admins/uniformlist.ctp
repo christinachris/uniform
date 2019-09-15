@@ -41,7 +41,7 @@
                     <tr>
                         <th><p><?php echo $this->Html->link($uniform['uniformname'],['controller'=>'admins',
                                     'action' => 'uniformdetails', $uniform->_id], ['class'=>'btn btn-info']);?></p></th>
-                        <th style="vertical-align: middle"><p><?php echo $uniform['type'];?></p></th>
+                        <th style="vertical-align: middle"><p><?php echo $uniform['uniformType'];?></p></th>
                         <th style="vertical-align: middle"><p><?php echo $uniform['gender'];?></p></th>
                         <th style="vertical-align: middle"><p><?php
                             if ($uniform['status'] == 1) {

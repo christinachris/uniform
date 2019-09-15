@@ -41,7 +41,7 @@
         </div>
         <div class="form-group">
             <b style="color: #262261;">Type</b>
-            <p><?= h($uniform->type) ?></p>
+            <p><?= h($uniform->uniformType) ?></p>
         </div>
         <div class="form-group">
             <b style="color: #262261;">Gender</b>
@@ -55,22 +55,27 @@
             <b style="color: #262261;">Main Image</b>
             <br>
             <div class="product-image" style="float: none;">
-                <?php echo $this->Html->image($uniform->heroimagepath, ['alt' => 'CakePHP']);?>
+                <?php echo $this->Html->image("/files/Uniforms/heroimagepath/{$uniform->heroimagepath}");?>
             </div>
         </div>
+
         <div class="form-group">
-            <b style="color: #262261;">Other Image</b>
+            <b style="color: #262261;">Size Image</b>
             <br>
             <div class="product-image" style="float: none;">
-            <?php foreach($pictures as $picture){ ?>
-
-                <?php echo $this->Html->image($picture->extraphotopath, ['alt' => 'CakePHP']);?>
-
-
+                <?php echo $this->Html->image("/files/Uniforms/sizechartpath/{$uniform->sizechartpath}");?>
             </div>
-            <?php } ?>
         </div>
 
+        <div class="form-group">
+            <b style="color: #262261;">Extra Image</b>
+            <!--placeholder for extra image photo gallary-->
+        </div>
     </div>
+
+
+
+
+</div>
 
 </div>

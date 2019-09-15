@@ -21,7 +21,6 @@
                 ['controller'=>'Admins', 'action'=>'organisationedit',$organisation->_id],
                 ['escape' => false, 'class' => 'btn btn-primary']); ?>
 
-
             <?php echo $this->Html->link('<span class="m-menu__link-text">' . h('See Uniforms') . '</span>',
                 ['controller'=>'admins', 'action'=>'uniformlist',$organisation->_id],
                 ['escape' => false, 'class' => 'btn btn-dark']); ?>
@@ -31,12 +30,21 @@
             <b style="color: #262261;">Organisation Status</b>
             <p><?= ($activeStatus) ?></p>
         </div>
+
+
+
+
         <div class="form-group">
             <b style="color: #262261;">Logo</b>
             <div class="product-image" style="float: none">
-                <?php echo $this->Html->image($organisation->logopath, ['alt' => 'CakePHP']);?>
+                <?php echo $this->Html->image("../files/organisations/logopath/{$organisation->logopath}"); ?>
             </div>
         </div>
+
+
+
+
+
         <br>
         <div class="form-group">
             <b style="color: #262261;">Accesscode</b>

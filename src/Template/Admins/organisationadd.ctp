@@ -2,7 +2,7 @@
     <?= $this->Flash->render() ?>
 </div>
 <div class="card">
-<?= $this->Form->create('',['url' => ['controller' => 'admins', 'action' => 'organisationadd']]); ?>
+<?= $this->Form->create('$organisation',['type' =>'file']); ?>
 <div class="card-header">
     <div class="row">
         <div class="col-lg-8 col-md-6 col-sm-4">
@@ -33,12 +33,17 @@
         <label style="padding-right: 10px">Organisation Status </label><?php echo $this->Form->select('active', $statusSelect);?>
     </div>
     <div class="form-group">
-        <label>Logo</label><?php echo $this->Form->logopath('logopath', ['class'=>'form-control', 'required']) ?>
+        <label>Logo</label><?php echo $this->Form->control('logopath', ['type'=>'file', 'required']) ?>
     </div>
+
+
 </div>
 <div>
     <?php echo $this->Form->submit('Save', ['class'=>'btn akame-btn active','style'=>'margin-left:35%']); ?>
+    <?php echo $this->Form->end(); ?>
 </div>
 <br/>
 </div>
-        <?php echo $this->Form->end(); ?>
+
+
+

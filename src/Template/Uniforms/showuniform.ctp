@@ -23,7 +23,8 @@
                                 <div class="text-center border" id="uniformItems">
 
                                     <figure>
-                                        <?php echo $this->Html->image($uniforms->heroimagepath, ['id' => 'unifomPic','url' =>['controller'=>'Uniforms', 'action' => 'showuniformdetail', $uniforms->_id]]);?>
+                                        
+                                        <?php echo $this->Html->image("../files/uniforms/heroimagepath/{$uniforms->heroimagepath}", ['id' => 'unifomPic','url' =>['controller'=>'Uniforms', 'action' => 'showuniformdetail', $uniforms->_id]]);?>
                                     </figure>
 
                                     <div class="p-4">
@@ -69,7 +70,7 @@
                         <div class="mb-4">
                             <!--Org name and logo -->
                             <div>
-                                <?php echo $this->Html->image($organisation->logopath);?>
+                                <?php echo $this->Html->image("../files/organisations/logopath/{$organisation->logopath}"); ?>
                             </div>
                             <br>
                                 <h5><?php echo $organisation->organisationname;?></h5>
@@ -82,7 +83,7 @@
                             <?= $this->Form->create('') ?>
                             <?php foreach($UniformType as $key => $UniformTypes){ ?>
                                 <label for="s_sm" class="d-flex">
-                                  <?= $this->Form->control('Types.'.$key,['label'=>$UniformTypes->type,"value"=>$UniformTypes->type,"type" => "checkbox", "class" => "checkbox1"]);?>
+                                  <?= $this->Form->control('Types.'.$key,['label'=>$UniformTypes->uniformType,"value"=>$UniformTypes->uniformType,"type" => "checkbox", "class" => "checkbox1"]);?>
                                 </label>
                             <?php } ?>
 

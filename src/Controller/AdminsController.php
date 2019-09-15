@@ -31,10 +31,10 @@ class AdminsController extends AppController
             ||$this->request->action === 'headerfooter'||$this->request->action === 'headerfooteredit'||$this->request->action === 'servicescontents'
             || $this->request->action === 'othercontent'||$this->request->action === 'othercontentedit'|| $this->request->action === 'servicescontentedit'||$this->request->action === 'contactuscontents'||$this->request->action === 'contactuscontentedit'
             ||$this->request->action === 'aboutuscontents'||$this->request->action === 'aboutuscontentedit'||$this->request->action === 'homepagecontents'
-            ||$this->request->action === 'homepagecontentedit'||$this->request->action === 'organisationlist'||$this->request->action === 'organisationdetails'
-            ||$this->request->action === 'organisationedit'||$this->request->action === 'organisationadd'||$this->request->action === 'organisationdelete'
-            ||$this->request->action === 'uniformlist'||$this->request->action === 'uniformdetails'||$this->request->action === 'uniformedit'
-            ||$this->request->action === 'uniformadd'||$this->request->action === 'uniformdelete'||$this->request->action === 'variantlist'
+            ||$this->request->action === 'homepagecontentedit'||$this->request->action === 'organisationlist'||$this->request->action === 'organisationdetails'||$this->request->action === 'organisationlogoedit' ||$this->request->action === 'uniformextraimageadd' ||$this->request->action === 'uniformextraimagedelete'
+            ||$this->request->action === 'organisationedit'||$this->request->action === 'organisationadd'
+            ||$this->request->action === 'uniformlist'||$this->request->action === 'uniformdetails'||$this->request->action === 'uniformedit'||$this->request->action === 'uniformimageedit' ||$this->request->action === 'uniformheroimageedit' ||$this->request->action === 'uniformsizeimageedit' ||$this->request->action === 'uniformsizeimageedit' ||$this->request->action === 'uniformextraimagelist'
+            ||$this->request->action === 'uniformadd'||$this->request->action === 'variantlist'
             ||$this->request->action === 'variantedit'||$this->request->action === 'variantadd'||$this->request->action === 'variantdelete'||$this->request->action === 'variantsave' || $this->request->action === 'orderlist'|| $this->request->action === 'orderdetails'|| $this->request->action === 'orderedit' ) {
 
             $oid=$user['organisation_id'];
@@ -505,24 +505,20 @@ class AdminsController extends AppController
         $statusSelect = array('1' => 'Active','0'=> 'Inactive');
         $this->set('statusSelect', $statusSelect);
 
-        $this->loadModel('organisations');
+        $this->loadModel('Organisations');
+        $organisation = $this->Organisations->newEntity();
+
 
         if($this->request->is(['patch', 'post', 'put'])) {
-            $newOrg = $this->organisations->newEntity();
 
-            $name = $this->request->getData('organisationname');
-            $accesscode = $this->request->getData('accesscode');
-            $bypasscode = $this->request->getData('bypasscode');
-            $logo = $this->request->getData('logopath');
-            $status = $this->request->getData('active');
+            $organisation = $this->Organisations->patchEntity($organisation, $this->request->getData());
 
+            $path_part = pathinfo($_FILES["logopath"]["name"]);
+            $name = $path_part['filename'].'_'.time().'.'.$path_part['extension'];
 
-            $newOrg->organisationname = $name;
-            $newOrg->accesscode = $accesscode;
-            $newOrg->bypasscode = $bypasscode;
-            $newOrg->logopath = $logo;
-            $newOrg->active = $status;
-            if ($this->organisations->save($newOrg)) {
+            $organisation->logopath['name']= $name;
+
+            if ($this->organisations->save($organisation)) {
 
                 $this->Flash->set('The data has been added', ['element' => 'success']);
 
@@ -562,6 +558,11 @@ class AdminsController extends AppController
 
             $organisation = $this->organisations->patchEntity($organisation, $this->request->getData());
 
+            $path_part = pathinfo($_FILES["logopath"]["name"]);
+            $name = $path_part['filename'].'_'.time().'.'.$path_part['extension'];
+
+            $organisation->logopath['name']= $name;
+
             if ($this->organisations->save($organisation)) {
 
                 $this->Flash->success(__('The data has been saved.'));
@@ -573,45 +574,42 @@ class AdminsController extends AppController
 
     }
 
-    public function organisationdelete($id=0){
+    public function organisationlogoedit($id=0){
 
         $this->loadModel('organisations');
-        $this->loadModel('variants');
-        $this->loadModel('uniforms');
 
         $organisation = $this->organisations->get($id);
+        $this->set('organisation', $organisation);
 
-        $uniforms = $this->uniforms->find('all')->where(['organisation_id'=>$id]);
+        if ($this->request->is(['patch', 'post', 'put'])) {
 
-        foreach ($uniforms as $uniform){
 
-            $uniformID = $uniform->id;
-            $variants = $this->variants->find('all')->where(['uniform_id'=>$uniformID]);
+            $organisation= $this->organisations->patchEntity($organisation, $this->request->getData());
 
-            foreach ($variants as $variant){
-                $this->variants->delete($variant);
+            $path_part = pathinfo($_FILES["logopath"]["name"]);
+            $name = $path_part['filename'].'_'.time().'.'.$path_part['extension'];
+
+            $organisation->logopath['name']= $name;
+
+            if ($this->organisations->save($organisation)) {
+
+                $this->Flash->success(__('The data has been saved.'));
+
+                return $this->redirect(['action' => 'organisationdetails', $id]);
             }
-
-            $this->uniforms->delete($uniform);
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
         }
-
-        if ($this->organisations->delete($organisation)) {
-            $this->Flash->success(__('The data has been deleted.'));
-        } else {
-            $this->Flash->error(__('The data could not be deleted. Please, try again.'));
-        }
-
-
-        return $this->redirect(['action' => 'organisationlist']);
 
     }
 
+
+
     public function uniformlist($id=0){
 
-        $this->loadModel('uniforms');
+        $this->loadModel('Uniforms');
         $this->loadModel('organisations');
 
-        $uniforms = $this->uniforms->find('all')->where(['organisation_id'=>$id]);
+        $uniforms = $this->Uniforms->find('all')->where(['organisation_id'=>$id]);
         $organisation = $this->organisations->get($id);
         $orgname = $organisation->organisationname;
         $iid=$id;
@@ -627,12 +625,12 @@ class AdminsController extends AppController
 
     public function uniformdetails($id=0){
 
-        $this->loadModel('uniforms');
-        $this->loadModel('pictures');
+        $this->loadModel('Uniforms');
+        $this->loadModel('Pictures');
 
-        $uniform = $this->uniforms->get($id);
+        $uniform = $this->Uniforms->get($id);
 
-        $pictures = $this->pictures->findByUniform_id($id)->toList();
+        $pictures = $this->Pictures->findByUniform_id($id)->toList();
 
         $this->set('uniform', $uniform);
 
@@ -662,9 +660,11 @@ class AdminsController extends AppController
     }
 
     public function uniformedit($id=0){
-        $this->loadModel('uniforms');
 
-        $uniform = $this->uniforms->get($id);
+        $this->loadModel('Uniforms');
+
+        $uniform = $this->Uniforms->get($id);
+        $this->set('uniform', $uniform);
 
         $orgid = $uniform->organisation_id;
         $this->set('orgid', $orgid);
@@ -690,10 +690,10 @@ class AdminsController extends AppController
 
         if ($this->request->is(['patch', 'post', 'put'])) {
 
+            $uniform = $this->Uniforms->patchEntity($uniform, $this->request->getData());
 
-            $uniform = $this->uniforms->patchEntity($uniform, $this->request->getData());
+            if ($this->Uniforms->save($uniform)) {
 
-            if ($this->uniforms->save($uniform)) {
 
                 $this->Flash->success(__('The data has been saved.'));
 
@@ -703,6 +703,142 @@ class AdminsController extends AppController
         }
 
         $this->set('uniform',$uniform);
+
+
+    }
+
+    public function uniformimageedit($uid=0){
+
+        $this->loadModel('Uniforms');
+
+        $uniform = $this->Uniforms->get($uid);
+
+        $this->set('uniform', $uniform);
+    }
+
+    public function uniformsizeimageedit($uid=0){
+        $this->loadModel('Uniforms');
+
+        $uniform = $this->Uniforms->get($uid);
+
+        $this->set('uniform', $uniform);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+
+
+            $uniform= $this->Uniforms->patchEntity($uniform, $this->request->getData());
+
+            $path_part = pathinfo($_FILES["sizechartpath"]["name"]);
+            $name = $path_part['filename'].'_'.time().'.'.$path_part['extension'];
+
+            $uniform->sizechartpath['name']= $name;
+
+            if ($this->Uniforms->save($uniform)) {
+
+                $this->Flash->success(__('The data has been saved.'));
+
+                return $this->redirect(['action' => 'uniformimageedit', $uid]);
+            }
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+        }
+
+
+    }
+
+    public function uniformextraimagelist($uid=0){
+        $this->loadModel('Pictures');
+
+        $pictures = $this->Pictures->findByUniform_id($uid)->toList();
+
+        $this->set('pictures', $pictures);
+        $this->set('uid', $uid);
+
+    }
+
+    public function uniformextraimageadd($uid=0){
+        $this->loadModel('Pictures');
+        $this->loadModel('Uniforms');
+
+        $uniform = $this->Uniforms->get($uid);
+        $this->set('uniform',$uniform );
+
+        $picture = $this->Pictures->newEntity();
+        $this->set('picture',$picture);
+
+
+        if($this->request->is(['patch', 'post', 'put'])) {
+
+            $picture = $this->Pictures->patchEntity($picture, $this->request->getData());
+            $picture->uniform_id = $uid;
+
+            $path_part = pathinfo($_FILES["extraphotopath"]["name"]);
+            $name = $path_part['filename'].'_'.time().'.'.$path_part['extension'];
+
+            $picture->extraphotopath['name']= $name;
+
+            if ($this->Pictures->save($picture)) {
+
+                $this->Flash->set('The data has been added', ['element' => 'success']);
+
+                return $this->redirect(['controller' => 'Admins', 'action' => 'uniformextraimagelist',$uid]);
+
+            } else {
+
+                $this->Flash->error(__('Sorry, we could not save the data. Please try again.'));
+                return $this->redirect(['action' => 'uniformextraimageadd',$uid]);
+
+            }
+        }
+
+
+    }
+
+    public function uniformextraimagedelete($pid=0){
+
+        $this->loadModel('Pictures');
+
+        $picture = $this->Pictures->get($pid);
+        $uniformid = $picture->uniform_id;
+
+        if ($this->Pictures->delete($picture)) {
+                $this->Flash->success(__('The data has been deleted.'));
+        } else {
+                $this->Flash->error(__('The data could not be deleted. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'uniformextraimagelist',$uniformid]);
+
+
+
+
+
+    }
+
+    public function uniformheroimageedit($uid=0){
+        $this->loadModel('Uniforms');
+
+        $uniform = $this->Uniforms->get($uid);
+
+        $this->set('uniform', $uniform);
+
+        if ($this->request->is(['patch', 'post', 'put'])) {
+
+
+            $uniform= $this->Uniforms->patchEntity($uniform, $this->request->getData());
+
+            $path_part = pathinfo($_FILES["heroimagepath"]["name"]);
+            $name = $path_part['filename'].'_'.time().'.'.$path_part['extension'];
+
+            $uniform->heroimagepath['name']= $name;
+
+            if ($this->Uniforms->save($uniform)) {
+
+                $this->Flash->success(__('The data has been saved.'));
+
+                return $this->redirect(['action' => 'uniformimageedit', $uid]);
+            }
+            $this->Flash->error(__('The data could not be saved. Please, try again.'));
+        }
 
 
     }
@@ -726,6 +862,15 @@ class AdminsController extends AppController
             $uniform = $this->Uniforms->patchEntity($uniform, $this->request->getData());
             $uniform->organisation_id = $oid;
 
+            $hero_path = pathinfo($_FILES["heroimagepath"]["name"]);
+            $size_path = pathinfo($_FILES["sizechartpath"]["name"]);
+
+            $name1 = $hero_path['filename'].'_'.time().'.'.$hero_path['extension'];
+            $name2 = $size_path['filename'].'_'.time().'.'.$size_path['extension'];
+
+            $uniform->heroimagepath['name']= $name1;
+            $uniform->sizechartpath['name']= $name2;
+
 
 
             if ($this->Uniforms->save($uniform)){
@@ -747,10 +892,10 @@ class AdminsController extends AppController
 
     public function uniformdelete($id=0){
         $this->loadModel('variants');
-        $this->loadModel('uniforms');
+        $this->loadModel('Uniforms');
 
         $variants = $this->variants->find('all')->where(['uniform_id'=>$id]);
-        $uniform = $this->uniforms->get($id);
+        $uniform = $this->Uniforms->get($id);
         $oid = $uniform->organisation_id;
 
         foreach($variants as $variant){
@@ -758,7 +903,7 @@ class AdminsController extends AppController
         }
 
 
-        if ($this->uniforms->delete($uniform)) {
+        if ($this->Uniforms->delete($uniform)) {
             $this->Flash->success(__('The data has been deleted.'));
         } else {
             $this->Flash->error(__('The data could not be deleted. Please, try again.'));
@@ -770,10 +915,10 @@ class AdminsController extends AppController
 
     public function variantlist($id=0){
         $this->loadModel('variants');
-        $this->loadModel('uniforms');
+        $this->loadModel('Uniforms');
 
         $variants = $this->variants->find('all')->where(['uniform_id'=>$id]);
-        $uniform = $this->uniforms->get($id);
+        $uniform = $this->Uniforms->get($id);
 
         $uniformname = $uniform->uniformname;
 
@@ -885,7 +1030,7 @@ class AdminsController extends AppController
 
     public function orderlist(){
         $this->loadModel('Orders');
-        $this->loadModel('customers');
+        $this->loadModel('customer');
         $this->loadModel('organisations');
 
         $this->paginate = [

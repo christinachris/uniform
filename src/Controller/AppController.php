@@ -80,7 +80,7 @@ class AppController extends Controller
                 'controller' => 'Customers',
                 'action' => 'login'
             ],
-            'authError' => 'Please login to continue'
+            'authError' => 'Sorry, you cannot access this page, please log in with an authorised account'
         ]);
 
         /*

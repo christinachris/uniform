@@ -126,6 +126,7 @@ class UniformsController extends AppController
     }
 
     public function showuniform($oid=0){
+
         $this->loadModel('Organisations');
         $this->loadModel('Variants');
 
@@ -134,7 +135,7 @@ class UniformsController extends AppController
 
 
         $variant = $this->Variants->find('all');
-        //var_dump($variant);
+
 
 
 
@@ -145,8 +146,11 @@ class UniformsController extends AppController
             'contain' => []
         ]);
 
-        $UniformType = $this ->Uniforms ->find('all')->distinct(['type'])->where(['organisation_id'=>$oid]);
+        $Uniformtype = $this ->Uniforms ->find('all')->distinct(['uniformType'])->where(['organisation_id'=>$oid]);
         $gender= $this ->Uniforms ->find('all')->distinct(['gender'])->where(['organisation_id'=>$oid])->order(['gender']);
+
+       // var_dump($Uniformtype);
+
 
         if ($this->request->is('post')) {
             $types=[];
@@ -166,10 +170,10 @@ class UniformsController extends AppController
 
 
             if(!empty($types)&&!empty($gerders)){
-                $Uniform = $this->Uniforms->find('all', ['conditions' =>['and' =>[['type in' => $types],['gender in '=>$gerders],['organisation_id'=>$oid]]]]);
+                $Uniform = $this->Uniforms->find('all', ['conditions' =>['and' =>[['uniformType in' => $types],['gender in '=>$gerders],['organisation_id'=>$oid]]]]);
             }
             elseif (!empty($types)&&empty($gerders)){
-                $Uniform = $this->Uniforms->find('all', ['conditions' =>['and' =>[['type in' => $types],['organisation_id'=>$oid]]]]);
+                $Uniform = $this->Uniforms->find('all', ['conditions' =>['and' =>[['uniformType in' => $types],['organisation_id'=>$oid]]]]);
             }
             elseif(empty($types)&&!empty($gerders)){
                 $Uniform = $this->Uniforms->find('all', ['conditions' =>['and' =>[['gender in '=>$gerders],['organisation_id'=>$oid]]]]);
@@ -185,7 +189,7 @@ class UniformsController extends AppController
 
         $this->set('uniform', $Uniform);
         $this->set('organisation',$organisation);
-        $this->set('UniformType',$UniformType);
+        $this->set('UniformType',$Uniformtype);
         $this->set('gender',$gender);
         $this->set('variant',$variant);
         //$this->set('Variant',$Variant);

@@ -43,6 +43,10 @@ class OrganisationsTable extends Table
         $this->hasMany('Uniforms', [
             'foreignKey' => 'organisation_id'
         ]);
+
+        $this->addBehavior('Josegonzalez/Upload.Upload', [
+            'logopath' => []
+        ]);
     }
 
     /**
@@ -63,10 +67,11 @@ class OrganisationsTable extends Table
             ->requirePresence('organisationname', 'create')
             ->allowEmptyString('organisationname', false);
 
+        // Apparently the upload plugin doesn't like new validators, so we only leave the required field validator here.
         $validator
-            ->scalar('logopath')
-            ->requirePresence('logopath', 'create')
-            ->allowEmptyString('logopath', false);
+//            ->scalar('logopath')
+            ->requirePresence('logopath', 'create');
+//            ->allowEmptyString('logopath', false);
 
         $validator
             ->scalar('accesscode')

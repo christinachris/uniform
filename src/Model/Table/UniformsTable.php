@@ -47,6 +47,13 @@ class UniformsTable extends Table
         $this->hasMany('Variants', [
             'foreignKey' => 'uniform_id'
         ]);
+
+        $this->addBehavior('Josegonzalez/Upload.Upload', [
+            'heroimagepath' => [],
+            'sizechartpath' => []
+
+        ]);
+
     }
 
     /**
@@ -68,10 +75,10 @@ class UniformsTable extends Table
             ->allowEmptyString('uniformname', false);
 
         $validator
-            ->scalar('type')
-            ->maxLength('type', 1000)
-            ->requirePresence('type', 'create')
-            ->allowEmptyString('type', false);
+            ->scalar('uniformType')
+            ->maxLength('uniformType', 1000)
+            ->requirePresence('uniformType', 'create')
+            ->allowEmptyString('uniformType', false);
 
         $validator
             ->scalar('uniformdescription')
@@ -85,14 +92,11 @@ class UniformsTable extends Table
             ->requirePresence('gender', 'create')
             ->allowEmptyString('gender', false);
 
-        $validator
-            ->scalar('heroimagepath')
-            ->maxLength('heroimagepath', 300)
-            ->allowEmptyFile('heroimagepath');
-
-        $validator
-            ->scalar('sizechartpath')
-            ->allowEmptyString('sizechartpath');
+//        $validator
+//            ->allowEmptyFile('heroimagepath');
+//
+//        $validator
+//            ->allowEmptyString('sizechartpath');
 
         $validator
             ->boolean('status')

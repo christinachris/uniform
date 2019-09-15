@@ -23,6 +23,10 @@
             <p><?= h($order->orderdate) ?></p>
         </div>
         <div class="form-group">
+            <b style="color: #262261;">Order Email</b>
+            <p><?= h($order->email) ?></p>
+        </div>
+        <div class="form-group">
             <b style="color: #262261;">Order Comments</b>
             <p><?= h($order->comments) ?></p>
         </div>

@@ -142,92 +142,95 @@ class CustomersController extends AppController
 
 
     //REGISTER FUNCTION
-    public function  register(){
+    //1. check if phone no. is correct
+    //2. check if organisation access code is correct
+    //3. if the org code is correct, check that the organisation is active.
+    //4. if org is active check if email has already been used.
+    public function  register()
+    {
         //create new customer record
         $customer = $this->Customers->newEntity();
-
         if ($this->request->is('post')) {
 
             //validate phone number first
             $phone = $this->request->getData('phone');
-            $a= ((int) $phone) ;
-            $int_array  = array_map('intval', str_split($phone));
+            $a = ((int)$phone);
+            $int_array = array_map('intval', str_split($phone));
             //get the lenght of the array
             $int_lenght = count($int_array);
-            $c=is_int($a);
-            if( $c  &&  $int_lenght==10) {
-
-
-                //first check if email is already in use
-                $useremail = $this->request->getData('email'); //retrieve the email address from the form
-                $conditions = ['email' => $useremail]; //email = user email in form
-                $email_exists = $this->Customers->exists($conditions); //check if the email exists in the customers table.
-                if ($email_exists == true) {
-                    $emailerror = 'An account with this email has already been created.';
-                } //store error message in variable
-
-                //get all data from form that user fills out
-                $customer = $this->Customers->patchEntity($customer, $this->request->getData());
-                //create random token for verification and insert
-                $customer->token = Security::hash(Security::randomBytes(32));
-                //insert created date into customer record
-                $customer->createddate = date('Y-m-d H:i:s');
+            $c = is_int($a);
+            //if phone number is valid check for other things
+            if ($c && $int_lenght == 10) {
 
                 //find correct organisation id based on the access code entered:
                 $accesspassword = $this->request->getData('organisationcode'); //retrieve input from the form view
                 $this->loadModel('Organisations'); //load model
                 $query = $this->Organisations->findByAccesscode($accesspassword)->first(); //find matching organisation access code to input
-                //check if the organisation is active
-                $orgactivestatus = $query->active;
-                if ($orgactivestatus==1) {
+                //validate access code is correct
+                $orgmatch = ['accesscode' => $accesspassword]; //email = user email in form
+                $org_exists = $this->Organisations->exists($orgmatch); //check if the email exists in the customers table.
+                //if organisation access password is correct check for other things
+                if ($org_exists == true) {
 
-                    $customer->organisation_id = $query->_id; //put correct organisation id into the customer record
+                    //validate organisation is active
+                    $org_active = $query->active;
+                    if ($org_active == 1) {
 
-                    $orgmatch = ['accesscode' => $accesspassword]; //email = user email in form
-                    $org_exists = $this->Organisations->exists($orgmatch); //check if the email exists in the customers table.
-                    if ($org_exists == false) {
-                        $orgcoderror = 'The organisation code is incorrect or invalid. Please try again, or contact us.';
-                    }
+                        //validate email is unique and not already used
+                        $useremail = $this->request->getData('email'); //retrieve the email address from the form
+                        $conditions = ['email' => $useremail]; //email = user email in form
+                        $email_exists = $this->Customers->exists($conditions); //check if the email exists in the customers table.
+                        if ($email_exists == false) {
 
-                    if ($this->Customers->save($customer)) {
-                        $this->Flash->set('Registration successful, your confirmation email has been sent to ' . $this->request->getData('email'), ['element' => 'success']);
+                            //get all data from form that user fills out
+                            $customer = $this->Customers->patchEntity($customer, $this->request->getData());
+                            //create random token for verification and insert
+                            $customer->token = Security::hash(Security::randomBytes(32));
+                            //insert created date into customer record
+                            $customer->createddate = date('Y-m-d H:i:s');
+                            $customer->organisation_id = $query->_id; //put correct organisation id into the customer record
 
-                        //email details
-                        $email = new Email('default');
-                        $email->setattachments([
-                            'SClogo.png' => [
-                                'file' => WWW_ROOT . 'img' . DS . 'SClogo.png',
-                                'mimetype' => 'image/png',
-                                'contentId' => 'SClogo'
-                            ]
-                        ]);
-                        $email->setEmailFormat('html');
-                        $email->setFrom('noreply@shoreditchcorporate.com.au', 'Shoreditch Corporate');
-                        $email->setSubject('Please confirm your email to activate your account');
-                        $email->setTo($this->request->getData('email'));
-                        $email->setTemplate('register');
-                        $email->setViewVars([
-                            'name' => $this->request->getData('firstname'),
-                            'token' => $customer->token
-                        ]);
-                        $email->send();
+                            if ($this->Customers->save($customer)) {
+                                $this->Flash->set('Registration successful, your confirmation email has been sent to ' . $this->request->getData('email'), ['element' => 'success']);
+
+                                //email details
+                                $email = new Email('default');
+                                $email->setattachments([
+                                    'SClogo.png' => [
+                                        'file' => WWW_ROOT . 'img' . DS . 'SClogo.png',
+                                        'mimetype' => 'image/png',
+                                        'contentId' => 'SClogo'
+                                    ]
+                                ]);
+                                $email->setEmailFormat('html');
+                                $email->setFrom('noreply@shoreditchcorporate.com.au', 'Shoreditch Corporate');
+                                $email->setSubject('Please confirm your email to activate your account');
+                                $email->setTo($this->request->getData('email'));
+                                $email->setTemplate('register');
+                                $email->setViewVars([
+                                    'name' => $this->request->getData('firstname'),
+                                    'token' => $customer->token
+                                ]);
+                                $email->send();
+                            }
+                        } else {
+                            //return error if cannot send email
+                            $this->Flash->error(__('Account could not be created. This email address is already in use.'));
+                        }
                     } else {
-                        //return error if cannot create account and send email
-                        $this->Flash->error(__('Account could not be created. ' . $emailerror . ' ' . $orgcoderror));
+                        $this->Flash->error(__('Account could not be created. The organisation you are trying to create an account for is currently inactive.'));
                     }
                 } else {
-                    $this->Flash->error(__('Account could not be created: organisation is currently inactive. Please contact us for more information'));
+                    $this->Flash->error(__('Account could not be created. The organisation access code you entered was incorrect'));
                 }
-            }
-            else {
-
+            } else {
                 $this->Flash->error(__('Please enter a valid Australian phone number.'));
                 return $this->redirect(['action' => 'register']);
-
             }
-        }
 
+        }
     }
+
 
     //VERIFY ACCOUNT FUNCTION
     public function verification($token){
@@ -245,12 +248,15 @@ class CustomersController extends AppController
         if ($this->request->is('post')) {
 
             $accountemail = $this->request->getData('email'); //retrieve the email address from the form
-            $query = $this->Customers->findByEmail($accountemail)->first(); //find the customer in the db that matches the email input
-            $customertoken = $query->token; //retrieve customer token matching the email provided by user
             $customername = $query->firstname; //retrieve customer firstname matching the email provided by user
+            $query = $this->Customers->findByEmail($accountemail)->first(); //find the customer in the db that matches the email input
+            $customertoken = Security::hash(Security::randomBytes(32)); //create new token
+            $update = $this->Customers->patchEntity($query, ['token'=> $customertoken], ['validate'=> false]); //update customer record with new token
+            $this->Customers->save($update); //save the updated customer record
 
             $conditions = ['email' => $accountemail]; //email = user email in form
             $email_exists = $this->Customers->exists($conditions); //check if the email exists in the customers table.
+
 
             if ($email_exists==true){
                 //check the account has been verified before sending reset password email
@@ -284,11 +290,11 @@ class CustomersController extends AppController
                     $this->Flash->error(__('This account has not been verified yet. Please check your email for the verification link, 
                     or ask us to send you another'));
                 }
+
             } else {
                 //if the email doesnt exist then return error
                 $this->Flash->error(__('We could not find an account with this email address.'));
             }
-
         }
     }
 
@@ -325,7 +331,7 @@ class CustomersController extends AppController
 
                 } else {
                     //otherwise return error for token and email not matching
-                    $this->Flash->error(__('Could not reset password, your email and reset code were incorrect'));
+                    $this->Flash->error(__('Could not reset password, your email and/or reset code were incorrect'));
                 }
 
             } else {
