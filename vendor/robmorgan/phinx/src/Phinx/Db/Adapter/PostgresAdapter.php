@@ -39,6 +39,8 @@ use Phinx\Util\Literal;
 
 class PostgresAdapter extends PdoAdapter implements AdapterInterface
 {
+    const INT_SMALL = 65535;
+
     /**
      * Columns with comments
      *
@@ -192,10 +194,14 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
 
          // Add the default primary key
         if (!isset($options['id']) || (isset($options['id']) && $options['id'] === true)) {
-            $options['id'] = 'id';
-        }
+            $column = new Column();
+            $column->setName('id')
+                   ->setType('integer')
+                   ->setIdentity(true);
 
-        if (isset($options['id']) && is_string($options['id'])) {
+            array_unshift($columns, $column);
+            $options['primary_key'] = 'id';
+        } elseif (isset($options['id']) && is_string($options['id'])) {
             // Handle id => "field_name" to support AUTO_INCREMENT
             $column = new Column();
             $column->setName($options['id'])
@@ -357,7 +363,7 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
     public function truncateTable($tableName)
     {
         $sql = sprintf(
-            'TRUNCATE TABLE %s RESTART IDENTITY',
+            'TRUNCATE TABLE %s',
             $this->quoteTableName($tableName)
         );
 
@@ -925,14 +931,18 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
             case static::PHINX_TYPE_INET:
             case static::PHINX_TYPE_MACADDR:
             case static::PHINX_TYPE_TIMESTAMP:
-            case static::PHINX_TYPE_INTEGER:
                 return ['name' => $type];
-            case static::PHINX_TYPE_SMALL_INTEGER:
-                return ['name' => 'smallint'];
+            case static::PHINX_TYPE_INTEGER:
+                if ($limit && $limit == static::INT_SMALL) {
+                    return [
+                        'name' => 'smallint',
+                        'limit' => static::INT_SMALL
+                    ];
+                }
+
+                return ['name' => $type];
             case static::PHINX_TYPE_DECIMAL:
                 return ['name' => $type, 'precision' => 18, 'scale' => 0];
-            case static::PHINX_TYPE_DOUBLE:
-                return ['name' => 'double precision'];
             case static::PHINX_TYPE_STRING:
                 return ['name' => 'character varying', 'limit' => 255];
             case static::PHINX_TYPE_CHAR:
@@ -965,7 +975,7 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
                     return ['name' => $type];
                 }
                 // Return array type
-                throw new UnsupportedColumnTypeException('Column type "' . $type . '" is not supported by Postgresql.');
+                throw new \RuntimeException('The type: "' . $type . '" is not supported');
         }
     }
 
@@ -973,8 +983,7 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
      * Returns Phinx type by SQL type
      *
      * @param string $sqlType SQL type
-     * @return string Phinx type
-     * @throws UnsupportedColumnTypeException
+     * @returns string Phinx type
      */
     public function getPhinxType($sqlType)
     {
@@ -992,7 +1001,10 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
             case 'jsonb':
                 return static::PHINX_TYPE_JSONB;
             case 'smallint':
-                return static::PHINX_TYPE_SMALL_INTEGER;
+                return [
+                    'name' => 'smallint',
+                    'limit' => static::INT_SMALL
+                ];
             case 'int':
             case 'int4':
             case 'integer':
@@ -1006,8 +1018,6 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
             case 'real':
             case 'float4':
                 return static::PHINX_TYPE_FLOAT;
-            case 'double precision':
-                return static::PHINX_TYPE_DOUBLE;
             case 'bytea':
                 return static::PHINX_TYPE_BINARY;
             case 'interval':
@@ -1036,7 +1046,7 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
             case 'macaddr':
                 return static::PHINX_TYPE_MACADDR;
             default:
-                throw new UnsupportedColumnTypeException('Column type "' . $sqlType . '" is not supported by Postgresql.');
+                throw new \RuntimeException('The PostgreSQL type: "' . $sqlType . '" is not supported');
         }
     }
 
@@ -1121,18 +1131,23 @@ class PostgresAdapter extends PdoAdapter implements AdapterInterface
                     strtoupper($sqlType['type']),
                     $sqlType['srid']
                 );
-            } elseif (in_array($sqlType['name'], ['time', 'timestamp'])) {
-                if (is_numeric($column->getPrecision())) {
-                    $buffer[] = sprintf('(%s)', $column->getPrecision());
-                }
-
-                if ($column->isTimezone()) {
-                    $buffer[] = strtoupper('with time zone');
-                }
             } elseif (!in_array($sqlType['name'], ['integer', 'smallint', 'bigint', 'boolean'])) {
                 if ($column->getLimit() || isset($sqlType['limit'])) {
                     $buffer[] = sprintf('(%s)', $column->getLimit() ?: $sqlType['limit']);
                 }
+            }
+
+            $timeTypes = [
+                'time',
+                'timestamp',
+            ];
+
+            if (in_array($sqlType['name'], $timeTypes) && is_numeric($column->getPrecision())) {
+                $buffer[] = sprintf('(%s)', $column->getPrecision());
+            }
+
+            if (in_array($sqlType['name'], $timeTypes) && $column->isTimezone()) {
+                $buffer[] = strtoupper('with time zone');
             }
         }
 

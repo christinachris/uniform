@@ -278,7 +278,7 @@ class Create extends AbstractCommand
 
         // inject the class names appropriate to this migration
         $classes = [
-            '$namespaceDefinition' => $namespace !== null ? (PHP_EOL . 'namespace ' . $namespace . ';' . PHP_EOL) : '',
+            '$namespaceDefinition' => $namespace !== null ? ('namespace ' . $namespace . ';') : '',
             '$namespace' => $namespace,
             '$useClassName' => $this->getConfig()->getMigrationBaseClassName(false),
             '$className' => $className,

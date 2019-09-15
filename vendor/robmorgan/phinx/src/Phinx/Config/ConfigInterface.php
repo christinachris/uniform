@@ -131,13 +131,6 @@ interface ConfigInterface extends \ArrayAccess
     public function isVersionOrderCreationTime();
 
     /**
-     * Get the bootstrap file path
-     *
-     * @return string|false
-     */
-    public function getBootstrapFile();
-
-    /**
      * Gets the base class name for migrations.
      *
      * @param bool $dropNamespace Return the base migration class name without the namespace.

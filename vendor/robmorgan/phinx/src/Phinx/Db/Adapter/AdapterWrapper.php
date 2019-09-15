@@ -256,26 +256,6 @@ abstract class AdapterWrapper implements AdapterInterface, WrapperInterface
     /**
      * {@inheritdoc}
      */
-    public function setBreakpoint(MigrationInterface $migration)
-    {
-        $this->getAdapter()->setBreakpoint($migration);
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function unsetBreakpoint(MigrationInterface $migration)
-    {
-        $this->getAdapter()->unsetBreakpoint($migration);
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function hasSchemaTable()
     {
         return $this->getAdapter()->hasSchemaTable();
